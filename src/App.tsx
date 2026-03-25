@@ -25,7 +25,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* Publicasd */}
         <Route path="/" element={<Login />} />
         <Route path="/login-v2" element={<LoginV2 />} />
 
