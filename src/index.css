@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+    font-size: calc(100vw / (1920 / var(--theme-rem-unit, 100))) !important;
+    font-family: "Poppins", sans-serif;
+    font-size: .16rem;
+    color: #374151;
+}
+
+/* Webkit browsers */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+div {
+    @apply select-none;
+}
