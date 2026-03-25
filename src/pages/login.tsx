@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 
@@ -17,10 +17,27 @@ const highlights = [
 export const Login = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const backgroundImage = `${import.meta.env.BASE_URL}images/loginBG2.png`;
+    const logoImage = `${import.meta.env.BASE_URL}images/logo.png`;
+
+    useEffect(() => {
+        if (localStorage.getItem("token")) {
+            navigate("/dashboard", { replace: true });
+        }
+    }, [navigate]);
 
     const login = () => {
-        localStorage.setItem("token", "loggedin");
-        navigate("/dashboard");
+        if (username.trim() === "admin" && password === "admin") {
+            localStorage.setItem("token", "loggedin");
+            setError("");
+            navigate("/dashboard", { replace: true });
+            return;
+        }
+
+        setError("Use username admin and password admin.");
     };
 
     return (
@@ -32,7 +49,7 @@ export const Login = () => {
                     <div className="absolute inset-0 bg-[linear-gradient(145deg,_rgba(15,23,42,0.9)_0%,_rgba(30,41,59,0.78)_45%,_rgba(37,99,235,0.62)_100%)]" />
                     <img
                         className="absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-screen"
-                        src="/images/loginBG2.png"
+                        src={backgroundImage}
                         alt="HR dashboard preview background"
                     />
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_rgba(255,255,255,0.18),_transparent_20%),radial-gradient(circle_at_80%_30%,_rgba(96,165,250,0.18),_transparent_25%)]" />
@@ -40,7 +57,7 @@ export const Login = () => {
                     <div className="relative z-10 grid h-full w-full grid-rows-[auto_1fr] px-[.64rem] py-[.36rem] text-white">
                         <div className="space-y-[.18rem]">
                             <div className="inline-flex items-center gap-[.14rem] rounded-full border border-white/20 bg-white/10 px-[.18rem] py-[.09rem] backdrop-blur-md">
-                                <img className="h-[.24rem] w-[.24rem]" src="/images/logo.png" alt="HRMS logo" />
+                                <img className="h-[.24rem] w-[.24rem]" src={logoImage} alt="HRMS logo" />
                                 <span className="font-['Montserrat'] text-[.17rem] font-semibold tracking-[0.18em] text-white/92">
                                     HRMS PORTAL
                                 </span>
@@ -131,11 +148,6 @@ export const Login = () => {
                                     </div>
                                 </div>
 
-                                <img
-                                    className="pointer-events-none absolute bottom-[-.24rem] right-[-.18rem] z-20 h-[3.05rem] object-contain drop-shadow-[0_.14rem_.32rem_rgba(15,23,42,0.22)]"
-                                    src="/images/meeting.png"
-                                    alt="HR illustration"
-                                />
                             </div>
                         </div>
                     </div>
@@ -146,7 +158,7 @@ export const Login = () => {
                         <div className="rounded-[.3rem] border border-white/60 bg-white/82 p-[.24rem] shadow-[0_.26rem_.8rem_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-[.28rem]">
                             <div className="flex items-center justify-between">
                                 <div className="inline-flex items-center gap-[.12rem] rounded-full bg-slate-900 px-[.16rem] py-[.09rem] text-white lg:hidden">
-                                    <img className="h-[.22rem] w-[.22rem]" src="/images/logo.png" alt="HRMS logo" />
+                                    <img className="h-[.22rem] w-[.22rem]" src={logoImage} alt="HRMS logo" />
                                     <span className="font-['Montserrat'] text-[.16rem] font-semibold tracking-[0.16em]">
                                         HRMS
                                     </span>
@@ -176,7 +188,9 @@ export const Login = () => {
                                         <input
                                             className="w-full bg-transparent text-[.17rem] text-slate-800 outline-none placeholder:text-slate-400"
                                             type="email"
-                                            placeholder="name@company.com"
+                                            placeholder="Enter username"
+                                            value={username}
+                                            onChange={(event) => setUsername(event.target.value)}
                                         />
                                     </div>
                                 </label>
@@ -197,6 +211,13 @@ export const Login = () => {
                                             className="w-full bg-transparent text-[.17rem] text-slate-800 outline-none placeholder:text-slate-400"
                                             type={showPassword ? "text" : "password"}
                                             placeholder="Enter your password"
+                                            value={password}
+                                            onChange={(event) => setPassword(event.target.value)}
+                                            onKeyDown={(event) => {
+                                                if (event.key === "Enter") {
+                                                    login();
+                                                }
+                                            }}
                                         />
                                         <button
                                             type="button"
@@ -213,6 +234,12 @@ export const Login = () => {
                                     </div>
                                 </label>
                             </div>
+
+                            {error ? (
+                                <div className="mt-[.12rem] rounded-[.16rem] border border-[#ffd8dd] bg-[#fff5f6] px-[.14rem] py-[.1rem] text-[.14rem] font-medium text-[#cc4a60]">
+                                    {error}
+                                </div>
+                            ) : null}
 
                             <div className="mt-[.14rem] flex items-center justify-between text-[.15rem] text-slate-600">
                                 <label className="flex items-center gap-[.1rem]">

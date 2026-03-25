@@ -28,6 +28,8 @@ type NavItem = {
 export const Main = ({ children }: MainProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const page = window.location.pathname.split("/").pop() || "dashboard";
+    const logoImage = `${import.meta.env.BASE_URL}images/logo.png`;
+    const profileImage = `${import.meta.env.BASE_URL}images/nobita.jpg`;
 
     const pageTitle =
         page.charAt(0).toUpperCase() + page.slice(1).replace("-", " ");
@@ -144,7 +146,7 @@ export const Main = ({ children }: MainProps) => {
                                 <div className="flex items-center gap-[.12rem]">
                                     <img
                                         className="h-[.44rem] w-[.44rem] rounded-[.14rem] object-cover ring-1 ring-white/15"
-                                        src="/images/logo.png"
+                                        src={logoImage}
                                         alt="HRMS Logo"
                                     />
                                     <div>
@@ -178,7 +180,7 @@ export const Main = ({ children }: MainProps) => {
                                     <span className="absolute right-[.06rem] top-[.06rem] h-[.07rem] w-[.07rem] rounded-full bg-emerald-300 ring-[.02rem] ring-[#20275d]" />
                                     <img
                                         className="h-[.3rem] w-[.3rem] object-cover"
-                                        src="/images/logo.png"
+                                        src={logoImage}
                                         alt="HRMS Logo"
                                     />
                                 </div>
@@ -197,7 +199,7 @@ export const Main = ({ children }: MainProps) => {
                             <div className="flex items-center gap-[.12rem]">
                                 <img
                                     className="h-[.58rem] w-[.58rem] rounded-full border border-white/25 object-cover"
-                                    src="/images/nobita.jpg"
+                                    src={profileImage}
                                     alt="Profile"
                                 />
                                 <div className="text-white">
@@ -308,7 +310,7 @@ export const Main = ({ children }: MainProps) => {
                                 <div className="mx-auto flex w-[.58rem] flex-col items-center gap-[.08rem] rounded-[.2rem] border border-white/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.11)_0%,_rgba(255,255,255,0.04)_100%)] px-[.08rem] py-[.1rem] text-white/72 animate-[collapsedDock_240ms_cubic-bezier(0.22,1,0.36,1)]">
                                     <img
                                         className="h-[.24rem] w-[.24rem] rounded-full border border-white/20 object-cover"
-                                        src="/images/nobita.jpg"
+                                        src={profileImage}
                                         alt="Profile"
                                     />
                                     <span className="h-[.05rem] w-[.05rem] rounded-full bg-emerald-300" />
@@ -380,7 +382,7 @@ export const Main = ({ children }: MainProps) => {
                             <button className="flex items-center gap-[.12rem] rounded-[.18rem] border border-slate-200 bg-white px-[.1rem] py-[.08rem] shadow-sm transition hover:bg-slate-50">
                                 <img
                                     className="size-[.48rem] rounded-full border border-slate-200 object-cover"
-                                    src="/images/nobita.jpg"
+                                    src={profileImage}
                                     alt="User"
                                 />
                                 <div className="text-left leading-[1.1]">

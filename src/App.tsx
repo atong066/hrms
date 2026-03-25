@@ -3,7 +3,7 @@ import { Login } from "./pages/login";
 import { LoginV2 } from "./pages/login_v2";
 import { Dashboard } from "./pages/dashboard";
 import { EmployeeOverview } from "./pages/employee";
-import { ProtectedRoute } from "./ProtectedRoute";
+import { ProtectedRoute, PublicRoute } from "./ProtectedRoute";
 import { AttendanceOverview } from "./pages/attendance";
 import { PayrollOverview } from "./pages/payroll";
 import { PerformanceOverview } from "./pages/performance";
@@ -26,8 +26,10 @@ function App() {
     <HashRouter>
       <Routes>
         {/* Publicasd */}
-        <Route path="/" element={<Login />} />
-        <Route path="/login-v2" element={<LoginV2 />} />
+        <Route element={<PublicRoute />}>
+          <Route path="/" element={<Login />} />
+          <Route path="/login-v2" element={<LoginV2 />} />
+        </Route>
 
         {/* Protected */}
         <Route element={<ProtectedRoute />}>
