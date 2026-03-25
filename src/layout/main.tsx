@@ -11,7 +11,7 @@ import { IoIosNotifications, IoMdSettings } from "react-icons/io";
 import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { PiHouseFill } from "react-icons/pi";
 import { RiLogoutCircleRFill } from "react-icons/ri";
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { CalendarDays, Search, Sparkles } from "lucide-react";
 
 interface MainProps {
@@ -27,7 +27,8 @@ type NavItem = {
 
 export const Main = ({ children }: MainProps) => {
     const [collapsed, setCollapsed] = useState(false);
-    const page = window.location.pathname.split("/").pop() || "dashboard";
+    const location = useLocation();
+    const page = location.pathname.split("/").pop() || "dashboard";
     const logoImage = `${import.meta.env.BASE_URL}images/logo.png`;
     const profileImage = `${import.meta.env.BASE_URL}images/nobita.jpg`;
 
