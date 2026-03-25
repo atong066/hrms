@@ -19,6 +19,7 @@ import { AnnouncementsOverview } from "./pages/announcements";
 import { AssetsOverview } from "./pages/assets";
 import { ReportsOverview } from "./pages/reports";
 import { CalendarOverview } from "./pages/calendar";
+import { FallbackRoute, LogoutRoute } from "./ProtectedRoute";
 
 
 function App() {
@@ -30,6 +31,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/login-v2" element={<LoginV2 />} />
         </Route>
+
+        <Route path="/logout" element={<LogoutRoute />} />
 
         {/* Protected */}
         <Route element={<ProtectedRoute />}>
@@ -51,6 +54,8 @@ function App() {
           <Route path="/reports" element={<ReportsOverview />} />
           <Route path="/settings" element={<SettingsOverview />} />
         </Route>
+
+        <Route path="*" element={<FallbackRoute />} />
       </Routes>
     </HashRouter>
   );

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router";
 
 export const ProtectedRoute = () => {
@@ -18,4 +19,18 @@ export const PublicRoute = () => {
   }
 
   return <Outlet />;
+};
+
+export const LogoutRoute = () => {
+  useEffect(() => {
+    localStorage.removeItem("token");
+  }, []);
+
+  return <Navigate to="/" replace />;
+};
+
+export const FallbackRoute = () => {
+  const token = localStorage.getItem("token");
+
+  return <Navigate to={token ? "/dashboard" : "/"} replace />;
 };

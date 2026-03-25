@@ -129,6 +129,11 @@ export const Main = ({ children }: MainProps) => {
         });
     }, [activePath, collapsed]);
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/", { replace: true });
+    };
+
     return (
         <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f4f7fb]">
             <style>{`
@@ -371,11 +376,12 @@ export const Main = ({ children }: MainProps) => {
 
                             <SidebarItem
                                 collapsed={collapsed}
-                                to="/logout"
+                                to="/"
                                 icon={<RiLogoutCircleRFill />}
-                                status={page === "logout"}
+                                status={false}
                                 text="Logout"
                                 tone="danger"
+                                onClick={handleLogout}
                             />
                         </div>
                     </nav>
@@ -486,6 +492,7 @@ interface SidebarProps {
     collapsed: boolean;
     tone?: "default" | "danger";
     itemRef?: React.RefObject<HTMLDivElement | null>;
+    onClick?: () => void;
 }
 
 function SidebarItem({
@@ -496,61 +503,79 @@ function SidebarItem({
     collapsed,
     tone = "default",
     itemRef,
+    onClick,
 }: SidebarProps) {
+    const content = (
+        <div
+            ref={itemRef}
+            className={`group relative mx-[.04rem] flex cursor-pointer items-center rounded-[.16rem] transition-all duration-300 ${
+                collapsed
+                    ? "justify-center px-[.08rem] py-[.09rem]"
+                    : "justify-start gap-[.12rem] px-[.14rem] py-[.12rem]"
+            } ${
+                status
+                    ? "animate-[sidebarSelect_320ms_cubic-bezier(0.22,1,0.36,1)] bg-[linear-gradient(90deg,_rgba(255,255,255,0.16)_0%,_rgba(255,255,255,0.08)_100%)] text-white shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.14),0_.06rem_.18rem_rgba(0,0,0,0.14)]"
+                    : tone === "danger"
+                        ? "text-rose-100/78 hover:bg-rose-400/10 hover:text-white"
+                        : "text-white/70 hover:bg-white/7 hover:text-white"
+            }`}
+        >
+            <div
+                className={`relative flex items-center justify-center transition-transform duration-300 ${
+                    collapsed
+                        ? `h-[.42rem] w-[.42rem] rounded-[.14rem] border ${
+                              status
+                                  ? "border-white/16 bg-white/10 shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.06)]"
+                                  : tone === "danger"
+                                      ? "border-transparent bg-transparent group-hover:border-rose-200/10 group-hover:bg-rose-400/10"
+                                      : "border-transparent bg-transparent group-hover:border-white/8 group-hover:bg-white/8"
+                          } text-[.2rem]`
+                        : "text-[.2rem]"
+                } ${status ? "animate-[sidebarContent_260ms_cubic-bezier(0.22,1,0.36,1)]" : ""}`}
+            >
+                {status && !collapsed && (
+                    <span className="absolute -left-[.11rem] h-[.24rem] w-[.03rem] origin-center rounded-full bg-white/85 animate-[sidebarRail_260ms_cubic-bezier(0.22,1,0.36,1)]" />
+                )}
+                {status && collapsed && (
+                    <span className="absolute -right-[.02rem] top-[.04rem] h-[.07rem] w-[.07rem] rounded-full bg-white/90 ring-[.02rem] ring-[#2b2f73]" />
+                )}
+                {icon}
+            </div>
+
+            {!collapsed && (
+                <span
+                    className={`text-[.16rem] font-medium tracking-[0.01em] transition-transform duration-300 ${
+                        status ? "animate-[sidebarContent_260ms_cubic-bezier(0.22,1,0.36,1)]" : ""
+                    }`}
+                >
+                    {text}
+                </span>
+            )}
+
+            {collapsed && (
+                <span className="pointer-events-none absolute left-[calc(100%+.12rem)] top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-[.12rem] border border-[#dfe5fb] bg-white px-[.1rem] py-[.07rem] text-[.12rem] font-medium text-[#34426c] shadow-[0_.08rem_.22rem_rgba(15,23,42,0.12)] group-hover:block">
+                    {text}
+                </span>
+            )}
+        </div>
+    );
+
+    if (onClick) {
+        return (
+            <button
+                type="button"
+                title={collapsed ? text : undefined}
+                onClick={onClick}
+                className="w-full text-left"
+            >
+                {content}
+            </button>
+        );
+    }
+
     return (
         <Link to={to} title={collapsed ? text : undefined}>
-            <div
-                ref={itemRef}
-                className={`group relative mx-[.04rem] flex cursor-pointer items-center rounded-[.16rem] transition-all duration-300 ${
-                    collapsed
-                        ? "justify-center px-[.08rem] py-[.09rem]"
-                        : "justify-start gap-[.12rem] px-[.14rem] py-[.12rem]"
-                } ${
-                    status
-                        ? "animate-[sidebarSelect_320ms_cubic-bezier(0.22,1,0.36,1)] bg-[linear-gradient(90deg,_rgba(255,255,255,0.16)_0%,_rgba(255,255,255,0.08)_100%)] text-white shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.14),0_.06rem_.18rem_rgba(0,0,0,0.14)]"
-                        : tone === "danger"
-                            ? "text-rose-100/78 hover:bg-rose-400/10 hover:text-white"
-                            : "text-white/70 hover:bg-white/7 hover:text-white"
-                }`}
-            >
-                <div
-                    className={`relative flex items-center justify-center transition-transform duration-300 ${
-                        collapsed
-                            ? `h-[.42rem] w-[.42rem] rounded-[.14rem] border ${
-                                  status
-                                      ? "border-white/16 bg-white/10 shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.06)]"
-                                      : tone === "danger"
-                                          ? "border-transparent bg-transparent group-hover:border-rose-200/10 group-hover:bg-rose-400/10"
-                                          : "border-transparent bg-transparent group-hover:border-white/8 group-hover:bg-white/8"
-                              } text-[.2rem]`
-                            : "text-[.2rem]"
-                    } ${status ? "animate-[sidebarContent_260ms_cubic-bezier(0.22,1,0.36,1)]" : ""}`}
-                >
-                    {status && !collapsed && (
-                        <span className="absolute -left-[.11rem] h-[.24rem] w-[.03rem] origin-center rounded-full bg-white/85 animate-[sidebarRail_260ms_cubic-bezier(0.22,1,0.36,1)]" />
-                    )}
-                    {status && collapsed && (
-                        <span className="absolute -right-[.02rem] top-[.04rem] h-[.07rem] w-[.07rem] rounded-full bg-white/90 ring-[.02rem] ring-[#2b2f73]" />
-                    )}
-                    {icon}
-                </div>
-
-                {!collapsed && (
-                    <span
-                        className={`text-[.16rem] font-medium tracking-[0.01em] transition-transform duration-300 ${
-                            status ? "animate-[sidebarContent_260ms_cubic-bezier(0.22,1,0.36,1)]" : ""
-                        }`}
-                    >
-                        {text}
-                    </span>
-                )}
-
-                {collapsed && (
-                    <span className="pointer-events-none absolute left-[calc(100%+.12rem)] top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-[.12rem] border border-[#dfe5fb] bg-white px-[.1rem] py-[.07rem] text-[.12rem] font-medium text-[#34426c] shadow-[0_.08rem_.22rem_rgba(15,23,42,0.12)] group-hover:block">
-                        {text}
-                    </span>
-                )}
-            </div>
+            {content}
         </Link>
     );
 }

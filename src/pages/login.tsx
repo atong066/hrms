@@ -19,7 +19,6 @@ export const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const backgroundImage = `${import.meta.env.BASE_URL}images/loginBG2.png`;
     const logoImage = `${import.meta.env.BASE_URL}images/logo.png`;
 
@@ -30,14 +29,8 @@ export const Login = () => {
     }, [navigate]);
 
     const login = () => {
-        if (username.trim() === "admin" && password === "admin") {
-            localStorage.setItem("token", "loggedin");
-            setError("");
-            navigate("/dashboard", { replace: true });
-            return;
-        }
-
-        setError("Use username admin and password admin.");
+        localStorage.setItem("token", "loggedin");
+        navigate("/dashboard", { replace: true });
     };
 
     return (
@@ -234,12 +227,6 @@ export const Login = () => {
                                     </div>
                                 </label>
                             </div>
-
-                            {error ? (
-                                <div className="mt-[.12rem] rounded-[.16rem] border border-[#ffd8dd] bg-[#fff5f6] px-[.14rem] py-[.1rem] text-[.14rem] font-medium text-[#cc4a60]">
-                                    {error}
-                                </div>
-                            ) : null}
 
                             <div className="mt-[.14rem] flex items-center justify-between text-[.15rem] text-slate-600">
                                 <label className="flex items-center gap-[.1rem]">
