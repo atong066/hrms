@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { HashRouter, Route, Routes } from "react-router";
 import { Login } from "./pages/login";
 import { LoginV2 } from "./pages/login_v2";
 import { Dashboard } from "./pages/dashboard";
@@ -23,7 +23,7 @@ import { CalendarOverview } from "./pages/calendar";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {/* Publicasd */}
         <Route path="/" element={<Login />} />
@@ -50,7 +50,7 @@ function App() {
           <Route path="/settings" element={<SettingsOverview />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
