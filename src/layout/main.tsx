@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     FaCheckCircle,
     FaClipboardList,
@@ -11,7 +11,7 @@ import { IoIosNotifications, IoMdSettings } from "react-icons/io";
 import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { PiHouseFill } from "react-icons/pi";
 import { RiLogoutCircleRFill } from "react-icons/ri";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { CalendarDays, Search, Sparkles } from "lucide-react";
 
 interface MainProps {
@@ -28,9 +28,13 @@ type NavItem = {
 export const Main = ({ children }: MainProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
     const page = location.pathname.split("/").pop() || "dashboard";
+    const activePath = location.pathname || "/dashboard";
     const logoImage = `${import.meta.env.BASE_URL}images/logo.png`;
     const profileImage = `${import.meta.env.BASE_URL}images/nobita.jpg`;
+    const navRef = useRef<HTMLElement | null>(null);
+    const activeItemRef = useRef<HTMLDivElement | null>(null);
 
     const pageTitle =
         page.charAt(0).toUpperCase() + page.slice(1).replace("-", " ");
@@ -81,6 +85,49 @@ export const Main = ({ children }: MainProps) => {
         { to: "/reports", icon: <FaClipboardList />, text: "Reports", page: "reports" },
         { to: "/settings", icon: <IoMdSettings />, text: "Settings", page: "settings" },
     ];
+    const notificationItems = [
+        {
+            title: "Holiday policy updated",
+            detail: "New leave carry-over rules are now available.",
+            time: "10 min ago",
+        },
+        {
+            title: "Payroll reminder",
+            detail: "Finance needs salary adjustments by 3 PM.",
+            time: "35 min ago",
+        },
+        {
+            title: "Department note",
+            detail: "People Ops posted this week's onboarding schedule.",
+            time: "1 hour ago",
+        },
+    ];
+    const requestItems = [
+        {
+            title: "COE request pending",
+            detail: "2 employees are waiting for document release.",
+            time: "5 min ago",
+        },
+        {
+            title: "Payslip concern",
+            detail: "Finance flagged one payroll clarification request.",
+            time: "22 min ago",
+        },
+        {
+            title: "Attendance correction",
+            detail: "3 check-in adjustments need HR review today.",
+            time: "48 min ago",
+        },
+    ];
+
+    useEffect(() => {
+        if (collapsed || !activeItemRef.current) return;
+
+        activeItemRef.current.scrollIntoView({
+            block: "center",
+            inline: "nearest",
+        });
+    }, [activePath, collapsed]);
 
     return (
         <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f4f7fb]">
@@ -220,7 +267,7 @@ export const Main = ({ children }: MainProps) => {
                         </div>
                     )}
 
-                    <nav className="relative flex flex-1 flex-col gap-[.16rem] overflow-y-auto px-[.1rem] pb-[.12rem]">
+                    <nav ref={navRef} className="relative flex flex-1 flex-col gap-[.16rem] overflow-y-auto px-[.1rem] pb-[.12rem]">
                         <div className="space-y-[.04rem]">
                             {!collapsed && (
                                 <p className="px-[.14rem] pb-[.04rem] text-[.11rem] uppercase tracking-[0.18em] text-white/35">
@@ -234,8 +281,9 @@ export const Main = ({ children }: MainProps) => {
                                     collapsed={collapsed}
                                     to={item.to}
                                     icon={item.icon}
-                                    status={page === item.page}
+                                    status={activePath === item.to}
                                     text={item.text}
+                                    itemRef={activePath === item.to ? activeItemRef : undefined}
                                 />
                             ))}
                         </div>
@@ -253,8 +301,9 @@ export const Main = ({ children }: MainProps) => {
                                     collapsed={collapsed}
                                     to={item.to}
                                     icon={item.icon}
-                                    status={page === item.page}
+                                    status={activePath === item.to}
                                     text={item.text}
+                                    itemRef={activePath === item.to ? activeItemRef : undefined}
                                 />
                             ))}
                         </div>
@@ -272,8 +321,9 @@ export const Main = ({ children }: MainProps) => {
                                     collapsed={collapsed}
                                     to={item.to}
                                     icon={item.icon}
-                                    status={page === item.page}
+                                    status={activePath === item.to}
                                     text={item.text}
+                                    itemRef={activePath === item.to ? activeItemRef : undefined}
                                 />
                             ))}
                         </div>
@@ -291,8 +341,9 @@ export const Main = ({ children }: MainProps) => {
                                     collapsed={collapsed}
                                     to={item.to}
                                     icon={item.icon}
-                                    status={page === item.page}
+                                    status={activePath === item.to}
                                     text={item.text}
+                                    itemRef={activePath === item.to ? activeItemRef : undefined}
                                 />
                             ))}
                         </div>
@@ -373,9 +424,27 @@ export const Main = ({ children }: MainProps) => {
                             </button>
 
                             <div className="flex items-center gap-[.08rem] rounded-[.18rem] border border-slate-200 bg-white/90 px-[.1rem] py-[.08rem] shadow-sm">
-                                <HeaderIconButton icon={<FaConciergeBell />} />
-                                <HeaderIconButton icon={<IoIosNotifications />} badge="3" />
-                                <HeaderIconButton icon={<IoMdSettings />} />
+                                <HeaderPopoverButton
+                                    icon={<FaConciergeBell />}
+                                    badge="3"
+                                    label="Requests / Tickets"
+                                    title="Open requests"
+                                    items={requestItems}
+                                    onViewAll={() => navigate("/requests")}
+                                />
+                                <HeaderPopoverButton
+                                    icon={<IoIosNotifications />}
+                                    badge="3"
+                                    label="Notifications"
+                                    title="Latest announcements"
+                                    items={notificationItems}
+                                    onViewAll={() => navigate("/announcements")}
+                                />
+                                <HeaderIconButton
+                                    icon={<IoMdSettings />}
+                                    label="Settings"
+                                    onClick={() => navigate("/settings")}
+                                />
                             </div>
 
                             <div className="h-[.38rem] w-px bg-slate-200" />
@@ -416,6 +485,7 @@ interface SidebarProps {
     to: string;
     collapsed: boolean;
     tone?: "default" | "danger";
+    itemRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 function SidebarItem({
@@ -425,10 +495,12 @@ function SidebarItem({
     to,
     collapsed,
     tone = "default",
+    itemRef,
 }: SidebarProps) {
     return (
         <Link to={to} title={collapsed ? text : undefined}>
             <div
+                ref={itemRef}
                 className={`group relative mx-[.04rem] flex cursor-pointer items-center rounded-[.16rem] transition-all duration-300 ${
                     collapsed
                         ? "justify-center px-[.08rem] py-[.09rem]"
@@ -483,9 +555,25 @@ function SidebarItem({
     );
 }
 
-function HeaderIconButton({ icon, badge }: { icon: ReactNode; badge?: string }) {
+function HeaderIconButton({
+    icon,
+    badge,
+    label,
+    onClick,
+}: {
+    icon: ReactNode;
+    badge?: string;
+    label: string;
+    onClick?: () => void;
+}) {
     return (
-        <button className="relative flex size-[.42rem] items-center justify-center rounded-[.12rem] border border-transparent bg-transparent text-slate-500 transition hover:bg-slate-50 hover:text-slate-700">
+        <button
+            type="button"
+            title={label}
+            aria-label={label}
+            onClick={onClick}
+            className="relative flex size-[.42rem] items-center justify-center rounded-[.12rem] border border-transparent bg-transparent text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+        >
             {badge && (
                 <span className="absolute right-[.01rem] top-[.01rem] flex h-[.16rem] min-w-[.16rem] items-center justify-center rounded-full bg-[#ff5b6e] px-[.03rem] text-[.09rem] font-semibold leading-none text-white">
                     {badge}
@@ -493,5 +581,109 @@ function HeaderIconButton({ icon, badge }: { icon: ReactNode; badge?: string }) 
             )}
             <span className="text-[.18rem]">{icon}</span>
         </button>
+    );
+}
+
+function HeaderPopoverButton({
+    icon,
+    badge,
+    label,
+    title,
+    items,
+    onViewAll,
+}: {
+    icon: ReactNode;
+    badge?: string;
+    label: string;
+    title: string;
+    items: { title: string; detail: string; time: string }[];
+    onViewAll?: () => void;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (ref.current && !ref.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div ref={ref} className="relative">
+            <button
+                type="button"
+                title={label}
+                aria-label={label}
+                onClick={() => setOpen((current) => !current)}
+                className={`relative flex size-[.42rem] items-center justify-center rounded-[.12rem] border transition ${
+                    open
+                        ? "border-[#dbe4ff] bg-[#f4f7ff] text-[#5b6cff]"
+                        : "border-transparent bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                }`}
+            >
+                {badge && (
+                    <span className="absolute right-[.01rem] top-[.01rem] flex h-[.16rem] min-w-[.16rem] items-center justify-center rounded-full bg-[#ff5b6e] px-[.03rem] text-[.09rem] font-semibold leading-none text-white">
+                        {badge}
+                    </span>
+                )}
+                <span className="text-[.18rem]">{icon}</span>
+            </button>
+
+            <div
+                className={`absolute right-0 top-full z-40 mt-[.08rem] flex h-auto max-h-[4.6rem] w-[3.2rem] origin-top-right flex-col overflow-hidden rounded-[.2rem] border border-[#e2e8f4] bg-white p-[.08rem] shadow-[0_.18rem_.4rem_rgba(15,23,42,0.14)] transition-all duration-200 ${
+                    open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-[.03rem] opacity-0"
+                }`}
+            >
+                <div className="flex items-center justify-between px-[.1rem] py-[.08rem]">
+                    <div>
+                        <p className="text-[.11rem] font-semibold uppercase tracking-[0.16em] text-[#8a96b7]">
+                            {label}
+                        </p>
+                        <p className="mt-[.02rem] text-[.14rem] font-medium text-[#30406b]">
+                            {title}
+                        </p>
+                    </div>
+                    <span className="rounded-full bg-[#f4f7ff] px-[.08rem] py-[.04rem] text-[.11rem] font-semibold text-[#5b6cff]">
+                        {badge ?? items.length}
+                    </span>
+                </div>
+
+                <div className="mt-[.04rem] flex h-auto flex-col gap-[.06rem] overflow-y-auto">
+                    {items.map((item) => (
+                        <button
+                            key={`${item.title}-${item.time}`}
+                            type="button"
+                            onClick={() => {
+                                setOpen(false);
+                                onViewAll?.();
+                            }}
+                            className="w-full rounded-[.14rem] border border-[#edf1f8] bg-[#fbfcff] px-[.12rem] py-[.1rem] text-left transition hover:border-[#dbe4ff] hover:bg-[#f6f8ff]"
+                        >
+                            <div className="flex items-start justify-between gap-[.1rem]">
+                                <p className="text-[.135rem] font-medium text-[#31406c]">{item.title}</p>
+                                <span className="shrink-0 text-[.11rem] text-[#93a0be]">{item.time}</span>
+                            </div>
+                            <p className="mt-[.03rem] text-[.12rem] leading-[1.5] text-[#7280a7]">{item.detail}</p>
+                        </button>
+                    ))}
+                </div>
+
+                <button
+                    type="button"
+                    onClick={() => {
+                        setOpen(false);
+                        onViewAll?.();
+                    }}
+                    className="mt-[.08rem] inline-flex w-full items-center justify-center rounded-[.14rem] border border-[#dfe5fb] bg-[#f8faff] px-[.14rem] py-[.09rem] text-[.13rem] font-medium text-[#5b6cff] transition hover:bg-[#eef2ff]"
+                >
+                    {`View all ${label.toLowerCase()}`}
+                </button>
+            </div>
+        </div>
     );
 }
