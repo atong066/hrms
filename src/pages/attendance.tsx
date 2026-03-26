@@ -3,6 +3,7 @@ import {
     CalendarRange,
     Clock3,
     Download,
+    Eye,
     Search,
     ShieldCheck,
     TimerReset,
@@ -11,7 +12,9 @@ import {
 import { GoListUnordered } from "react-icons/go";
 import { MdOutlineFilterList } from "react-icons/md";
 import { Main } from "../layout/main";
+import { DatePicker } from "../utils/date_picker";
 import { Dropdown } from "../utils/FilterDropdown";
+import { Modal } from "../utils/modal";
 
 const statCards = [
     {
@@ -53,6 +56,17 @@ type AttendanceRow = {
     hours: string;
 };
 
+type AttendanceHistoryEntry = {
+    date: string;
+    dateValue: string;
+    shift: string;
+    checkIn: string;
+    checkOut: string;
+    status: AttendanceRow["status"];
+    hours: string;
+    note: string;
+};
+
 const attendance: AttendanceRow[] = Array.from({ length: 42 }, (_, i) => ({
     id: i + 1,
     name: `Employee ${i + 1}`,
@@ -66,6 +80,52 @@ const attendance: AttendanceRow[] = Array.from({ length: 42 }, (_, i) => ({
     hours: i % 7 === 0 ? "0h 0m" : i % 4 === 0 ? "8h 05m" : "8h 12m",
 }));
 
+const toIsoDate = (displayDate: string) => {
+    const parsed = new Date(displayDate);
+
+    if (Number.isNaN(parsed.getTime())) return "";
+
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const day = String(parsed.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const buildAttendanceHistory = (row: AttendanceRow): AttendanceHistoryEntry[] => {
+    const dates = ["Mar 21, 2026", "Mar 20, 2026", "Mar 19, 2026", "Mar 18, 2026", "Mar 17, 2026", "Mar 16, 2026"];
+
+    return dates.map((date, index) => {
+        const status =
+            index === 0
+                ? row.status
+                : (["Present", "Late", "Remote", "Present", "Absent", "Present"][index] as AttendanceRow["status"]);
+
+        const checkIn = status === "Absent" ? "--" : status === "Late" ? "09:14 AM" : status === "Remote" ? "08:59 AM" : "08:52 AM";
+        const checkOut = status === "Absent" ? "--" : "06:01 PM";
+        const hours = status === "Absent" ? "0h 0m" : status === "Remote" ? "8h 04m" : status === "Late" ? "7h 46m" : "8h 09m";
+        const note =
+            status === "Absent"
+                ? "Leave recorded by team lead."
+                : status === "Late"
+                    ? "Late arrival flagged by attendance policy."
+                    : status === "Remote"
+                        ? "Remote work arrangement approved."
+                        : "Completed shift within scheduled hours.";
+
+        return {
+            date,
+            dateValue: toIsoDate(date),
+            shift: index % 3 === 0 ? row.shift : "Day shift",
+            checkIn,
+            checkOut,
+            status,
+            hours,
+            note,
+        };
+    });
+};
+
 export const AttendanceOverview = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [departmentFilter, setDepartmentFilter] = useState("");
@@ -73,6 +133,7 @@ export const AttendanceOverview = () => {
     const [dateFilter, setDateFilter] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedAttendance, setSelectedAttendance] = useState<AttendanceRow | null>(null);
     const rowsPerPage = 10;
 
     const filteredAttendance = useMemo(() => {
@@ -265,6 +326,7 @@ export const AttendanceOverview = () => {
                                                 <th className="w-[.95rem] px-[.12rem] py-[.1rem]">Check out</th>
                                                 <th className="w-[.95rem] px-[.12rem] py-[.1rem]">Status</th>
                                                 <th className="w-[.85rem] px-[.12rem] py-[.1rem] text-right">Hours</th>
+                                                <th className="w-[1rem] px-[.12rem] py-[.1rem] text-right">Action</th>
                                             </tr>
                                         </thead>
 
@@ -335,6 +397,19 @@ export const AttendanceOverview = () => {
                                                             {item.hours}
                                                         </div>
                                                     </td>
+
+                                                    <td className="px-[.12rem] py-[.08rem]">
+                                                        <div className="flex min-h-[.44rem] items-center justify-end">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setSelectedAttendance(item)}
+                                                                className="inline-flex items-center gap-[.06rem] rounded-[.11rem] border border-[#dfe6fb] bg-white px-[.09rem] py-[.06rem] text-[.12rem] font-medium text-[#5365f6] transition hover:bg-[#f8faff]"
+                                                            >
+                                                                <Eye className="h-[.13rem] w-[.13rem]" />
+                                                                <span>View</span>
+                                                            </button>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -383,6 +458,10 @@ export const AttendanceOverview = () => {
                     </div>
                 </div>
             </section>
+            <AttendanceHistoryModal
+                employee={selectedAttendance}
+                onClose={() => setSelectedAttendance(null)}
+            />
         </Main>
     );
 };
@@ -428,5 +507,195 @@ function StatusPill({ status }: { status: AttendanceRow["status"] }) {
             <span className={`h-[.055rem] w-[.055rem] rounded-full ${dot}`} />
             {status}
         </span>
+    );
+}
+
+function AttendanceHistoryModal({
+    employee,
+    onClose,
+}: {
+    employee: AttendanceRow | null;
+    onClose: () => void;
+}) {
+    const [dateFilter, setDateFilter] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        setDateFilter("");
+        setCurrentPage(1);
+    }, [employee]);
+
+    if (!employee) return null;
+
+    const history = buildAttendanceHistory(employee);
+    const filteredHistory = history.filter((entry) => !dateFilter || entry.dateValue === dateFilter);
+    const rowsPerPage = 4;
+    const totalPages = Math.max(1, Math.ceil(filteredHistory.length / rowsPerPage));
+    const safePage = Math.min(currentPage, totalPages);
+    const paginatedHistory = filteredHistory.slice((safePage - 1) * rowsPerPage, safePage * rowsPerPage);
+    const pageStart = filteredHistory.length === 0 ? 0 : (safePage - 1) * rowsPerPage + 1;
+    const pageEnd = Math.min(safePage * rowsPerPage, filteredHistory.length);
+    const presentDays = history.filter((entry) => entry.status === "Present" || entry.status === "Remote").length;
+    const lateDays = history.filter((entry) => entry.status === "Late").length;
+    const absentDays = history.filter((entry) => entry.status === "Absent").length;
+
+    return (
+        <Modal open={Boolean(employee)}>
+            <div className="w-[7rem] overflow-hidden rounded-[.2rem] border border-[#dce3f3] bg-white shadow-[0_.24rem_.6rem_rgba(15,23,42,0.16)]">
+                <div className="border-b border-[#edf1f8] px-[.2rem] py-[.16rem]">
+                    <div className="flex items-start justify-between gap-[.14rem]">
+                        <div className="flex items-center gap-[.12rem]">
+                            <img
+                                src={`https://i.pravatar.cc/72?img=${employee.id}`}
+                                alt={employee.name}
+                                className="h-[.52rem] w-[.52rem] rounded-full border border-[#dde3f5]"
+                            />
+                            <div>
+                                <p className="text-[.11rem] font-semibold uppercase tracking-[0.16em] text-[#8a95b6]">
+                                    Attendance history
+                                </p>
+                                <h3 className="mt-[.04rem] font-['Montserrat'] text-[.24rem] font-semibold text-[#24305b]">
+                                    {employee.name}
+                                </h3>
+                                <p className="mt-[.03rem] text-[.13rem] text-[#6f7d9e]">
+                                    {employee.email} ? {employee.department} ? {employee.shift}
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="inline-flex items-center rounded-[.12rem] border border-[#dfe5f3] bg-white px-[.12rem] py-[.08rem] text-[.13rem] font-medium text-[#5f6d93] transition hover:bg-[#f7faff]"
+                        >
+                            Close
+                        </button>
+                    </div>
+
+                    <div className="mt-[.14rem] grid gap-[.1rem] md:grid-cols-3">
+                        <HistoryMiniCard label={`${presentDays} days`} value="Present / remote" tone="good" />
+                        <HistoryMiniCard label={`${lateDays} flags`} value="Late arrivals" tone="warning" />
+                        <HistoryMiniCard label={`${absentDays} records`} value="Absences" tone="danger" />
+                    </div>
+                </div>
+
+                <div className="max-h-[4.4rem] overflow-auto p-[.2rem]">
+                    <div className="rounded-[.18rem] border border-[#edf1f8] bg-white">
+                        <div className="border-b border-[#edf1f8] bg-[#f8faff] px-[.14rem] py-[.1rem]">
+                            <div className="flex flex-wrap items-center gap-[.08rem]">
+                                <p className="text-[.13rem] font-semibold uppercase tracking-[0.08em] text-[#7c86a8]">
+                                    Recent logs
+                                </p>
+
+                                <div className="ml-auto min-w-[2.1rem]">
+                                    <DatePicker
+                                        label="Date"
+                                        value={dateFilter}
+                                        onChange={(value) => {
+                                            setDateFilter(value);
+                                            setCurrentPage(1);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="overflow-auto">
+                            <table className="w-full table-fixed text-left">
+                                <thead className="border-b border-[#edf1f8] text-[.12rem] font-medium uppercase tracking-[0.08em] text-[#7c86a8]">
+                                    <tr>
+                                        <th className="w-[1.05rem] px-[.12rem] py-[.09rem]">Date</th>
+                                        <th className="w-[1rem] px-[.12rem] py-[.09rem]">Shift</th>
+                                        <th className="w-[.9rem] px-[.12rem] py-[.09rem]">Check in</th>
+                                        <th className="w-[.9rem] px-[.12rem] py-[.09rem]">Check out</th>
+                                        <th className="w-[.95rem] px-[.12rem] py-[.09rem]">Status</th>
+                                        <th className="w-[.8rem] px-[.12rem] py-[.09rem]">Hours</th>
+                                        <th className="px-[.12rem] py-[.09rem]">Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {paginatedHistory.map((entry) => (
+                                        <tr key={`${employee.id}-${entry.date}`} className="border-b border-[#edf1f8] last:border-b-0">
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex text-[.13rem] font-medium text-[#31406c]">{entry.date}</div></td>
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex text-[.13rem] text-[#556282]">{entry.shift}</div></td>
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex text-[.13rem] text-[#556282]">{entry.checkIn}</div></td>
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex text-[.13rem] text-[#556282]">{entry.checkOut}</div></td>
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex"><StatusPill status={entry.status} /></div></td>
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex text-[.13rem] font-semibold text-[#24305b]">{entry.hours}</div></td>
+                                            <td className="px-[.12rem] py-[.09rem]"><div className="flex text-[.13rem] text-[#6f7d9e]">{entry.note}</div></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="flex items-center justify-between border-t border-[#edf1f8] bg-[#fbfcff] px-[.14rem] py-[.1rem]">
+                            <div className="text-[.13rem] text-[#7b86a8]">
+                                {filteredHistory.length === 0 ? "0-0" : `${pageStart}-${pageEnd}`} of {filteredHistory.length}
+                            </div>
+
+                            <div className="flex items-center gap-[.04rem]">
+                                <button
+                                    type="button"
+                                    disabled={safePage === 1}
+                                    onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                                    className="h-[.3rem] rounded-[.08rem] border border-[#dde4f5] px-[.1rem] text-[.13rem] text-[#5b678f] transition hover:bg-white disabled:opacity-40"
+                                >
+                                    Prev
+                                </button>
+
+                                {Array.from({ length: totalPages }, (_, index) => (
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        onClick={() => setCurrentPage(index + 1)}
+                                        className={`h-[.3rem] min-w-[.3rem] rounded-[.08rem] border px-[.08rem] text-[.13rem] transition ${
+                                            safePage === index + 1
+                                                ? "border-[#5b6cff] bg-[#5b6cff] text-white"
+                                                : "border-[#dde4f5] bg-white text-[#5b678f] hover:bg-[#f8faff]"
+                                        }`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+
+                                <button
+                                    type="button"
+                                    disabled={safePage === totalPages}
+                                    onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                                    className="h-[.3rem] rounded-[.08rem] border border-[#dde4f5] px-[.1rem] text-[.13rem] text-[#5b678f] transition hover:bg-white disabled:opacity-40"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+    );
+}
+
+function HistoryMiniCard({
+    label,
+    value,
+    tone,
+}: {
+    label: string;
+    value: string;
+    tone: "good" | "warning" | "danger";
+}) {
+    const classes =
+        tone === "good"
+            ? "border-[#cdeedd] bg-[#f2fdf7] text-[#148a68]"
+            : tone === "warning"
+                ? "border-[#f8dfb0] bg-[#fff7e8] text-[#c78211]"
+                : "border-[#ffd8dd] bg-[#fff5f6] text-[#cc4a60]";
+
+    return (
+        <div className={`rounded-[.16rem] border px-[.14rem] py-[.12rem] ${classes}`}>
+            <p className="text-[.11rem] font-semibold uppercase tracking-[0.14em] opacity-80">{label}</p>
+            <p className="mt-[.04rem] text-[.2rem] font-semibold leading-none">{value}</p>
+        </div>
     );
 }

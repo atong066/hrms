@@ -35,7 +35,7 @@ export const AddEmployeeModal = ({
 
     return (
         <Modal open={status}>
-            <div className="w-[6.5rem] overflow-hidden rounded-[.18rem] border border-[#dce3f3] bg-white shadow-[0_.24rem_.6rem_rgba(15,23,42,0.16)]">
+            <div className="w-[6.5rem] overflow-visible rounded-[.18rem] border border-[#dce3f3] bg-white shadow-[0_.24rem_.6rem_rgba(15,23,42,0.16)]">
                 <div className="flex items-start justify-between border-b border-[#edf1f8] px-[.18rem] py-[.14rem]">
                     <div>
                         <h2 className="font-['Montserrat'] text-[.24rem] font-semibold leading-[1.1] text-[#24305b]">
@@ -53,7 +53,7 @@ export const AddEmployeeModal = ({
                     </button>
                 </div>
 
-                <div className="max-h-[5.9rem] overflow-auto px-[.18rem] py-[.14rem]">
+                <div className="relative z-10 max-h-[5.9rem] overflow-auto px-[.18rem] py-[.14rem]">
                     <div className="grid gap-[.16rem]">
                         <FormSection title="Personal Information">
                             <div className="grid gap-[.1rem] sm:grid-cols-2">
@@ -110,7 +110,7 @@ export const AddEmployeeModal = ({
                     </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-[.1rem] border-t border-[#edf1f8] px-[.18rem] py-[.14rem]">
+                <div className="relative z-0 flex items-center justify-end gap-[.1rem] border-t border-[#edf1f8] px-[.18rem] py-[.14rem]">
                     <button
                         type="button"
                         onClick={() => open(false)}
@@ -246,6 +246,7 @@ function SelectField({
     tone?: "default" | "status";
 }) {
     const [open, setOpen] = useState(false);
+    const [openAbove, setOpenAbove] = useState(false);
     const [selectedValue, setSelectedValue] = useState(value ?? "");
     const ref = useRef<HTMLDivElement>(null);
 
@@ -264,13 +265,52 @@ function SelectField({
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const getScrollParent = (element: HTMLElement | null) => {
+        let current = element?.parentElement ?? null;
+
+        while (current) {
+            const { overflowY } = window.getComputedStyle(current);
+
+            if (overflowY === "auto" || overflowY === "scroll") {
+                return current;
+            }
+
+            current = current.parentElement;
+        }
+
+        return null;
+    };
+
+    const toggleOpen = () => {
+        if (!open && ref.current) {
+            const rect = ref.current.getBoundingClientRect();
+            const estimatedMenuHeight = 280;
+            const scrollParent = getScrollParent(ref.current);
+
+            if (scrollParent) {
+                const containerRect = scrollParent.getBoundingClientRect();
+                const spaceBelow = containerRect.bottom - rect.bottom;
+                const spaceAbove = rect.top - containerRect.top;
+
+                setOpenAbove(spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow);
+            } else {
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const spaceAbove = rect.top;
+
+                setOpenAbove(spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow);
+            }
+        }
+
+        setOpen((current) => !current);
+    };
+
     return (
         <div ref={ref}>
             <FieldLabel label={label} required={required} />
             <div className="relative">
                 <button
                     type="button"
-                    onClick={() => setOpen((current) => !current)}
+                    onClick={toggleOpen}
                     className={`group flex h-[.42rem] w-full items-center gap-[.08rem] rounded-[.14rem] border px-[.14rem] text-left transition duration-200 ${
                         open
                             ? "border-[#b9c8ff] bg-[#f6f8ff] shadow-[0_.08rem_.2rem_rgba(83,101,246,0.12)]"
@@ -293,8 +333,10 @@ function SelectField({
                 </button>
 
                 <div
-                    className={`absolute left-0 right-0 top-full z-30 mt-[.06rem] origin-top overflow-hidden rounded-[.16rem] border border-[#e4eaf7] bg-white p-[.06rem] shadow-[0_.16rem_.38rem_rgba(21,32,68,0.12)] transition-all duration-200 ${
-                        open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-[.03rem] opacity-0"
+                    className={`absolute left-0 right-0 z-30 max-h-[2.8rem] overflow-auto rounded-[.16rem] border border-[#e4eaf7] bg-white p-[.06rem] shadow-[0_.16rem_.38rem_rgba(21,32,68,0.12)] transition-all duration-200 ${
+                        openAbove ? "bottom-full mb-[.06rem] origin-bottom" : "top-full mt-[.06rem] origin-top"
+                    } ${
+                        open ? "pointer-events-auto translate-y-0 opacity-100" : `pointer-events-none ${openAbove ? "translate-y-[.03rem]" : "-translate-y-[.03rem]"} opacity-0`
                     }`}
                 >
                     <button

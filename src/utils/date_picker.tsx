@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Calendar } from "lucide-react";
+import { Calendar, X } from "lucide-react";
 
 type DatePickerProps = {
   label: string;
@@ -63,8 +63,20 @@ export const DatePicker = ({ label, value, onChange }: DatePickerProps) => {
         aria-hidden="true"
       />
 
-      <div className="flex h-[.42rem] w-full items-center gap-[.08rem] rounded-[.14rem] border border-[#e2e8f4] bg-white px-[.14rem] text-left shadow-[0_.04rem_.12rem_rgba(17,24,39,0.04)] transition hover:border-[#d5def1] hover:bg-[#fbfcff]">
-        <span className="flex h-[.18rem] w-[.18rem] items-center justify-center text-[#7c89ac]">
+      <div
+        className={`group flex h-[.44rem] w-full items-center gap-[.1rem] rounded-[.16rem] border px-[.1rem] text-left transition duration-200 ${
+          date
+            ? "border-[#cfd9ff] bg-[linear-gradient(180deg,_#fbfcff_0%,_#f3f6ff_100%)] shadow-[0_.08rem_.2rem_rgba(83,101,246,0.08)]"
+            : "border-[#e2e8f4] bg-white shadow-[0_.04rem_.12rem_rgba(17,24,39,0.04)] hover:border-[#d5def1] hover:bg-[#fbfcff]"
+        }`}
+      >
+        <span
+          className={`flex h-[.28rem] w-[.28rem] items-center justify-center rounded-[.1rem] transition ${
+            date
+              ? "bg-[#eef2ff] text-[#5b6cff]"
+              : "bg-[#f6f8fc] text-[#7c89ac] group-hover:bg-[#eef2ff] group-hover:text-[#5b6cff]"
+          }`}
+        >
           <Calendar size={15} />
         </span>
 
@@ -73,10 +85,10 @@ export const DatePicker = ({ label, value, onChange }: DatePickerProps) => {
           onClick={openPicker}
           className="min-w-0 flex-1 text-left"
         >
-          <div className="text-[.1rem] font-semibold uppercase tracking-[0.12em] text-[#94a0bf]">
-            Filter
+          <div className="text-[.095rem] font-semibold uppercase tracking-[0.14em] text-[#97a3c1]">
+            {date ? "Selected date" : "Pick date"}
           </div>
-          <div className={`truncate text-[.145rem] font-medium ${date ? "text-[#39476f]" : "text-[#8090b5]"}`}>
+          <div className={`truncate text-[.145rem] font-medium ${date ? "text-[#2f3d69]" : "text-[#8090b5]"}`}>
             {date ? formatDate(date) : label}
           </div>
         </button>
@@ -85,9 +97,10 @@ export const DatePicker = ({ label, value, onChange }: DatePickerProps) => {
           <button
             type="button"
             onClick={clearDate}
-            className="text-[.12rem] font-medium text-[#8090b5] transition hover:text-[#5b6cff]"
+            className="inline-flex h-[.26rem] w-[.26rem] items-center justify-center rounded-full bg-white text-[#8a96b4] shadow-[0_.03rem_.08rem_rgba(15,23,42,0.06)] transition hover:bg-[#f5f7ff] hover:text-[#5b6cff]"
+            aria-label="Clear date"
           >
-            Clear
+            <X size={13} />
           </button>
         ) : null}
       </div>

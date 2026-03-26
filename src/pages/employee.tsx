@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BriefcaseBusiness, Check, ChevronDown, Download, Plus, Search, ShieldCheck, Users2, X } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Check, ChevronDown, Download, Search, ShieldCheck, UserPlus, Users2, X } from "lucide-react";
 import { GoListUnordered } from "react-icons/go";
 import { MdOutlineAutoDelete, MdOutlineFilterList } from "react-icons/md";
 import { GrView } from "react-icons/gr";
@@ -298,46 +298,51 @@ export const EmployeeOverview = () => {
                     </div>
 
                     <div className="rounded-[.24rem] border border-[#e5e9f5] bg-white shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
-                        <div className="flex flex-wrap items-center gap-[.1rem] border-b border-[#edf1f8] px-[.18rem] py-[.14rem]">
-                            <Dropdown
-                                label="Department"
-                                options={["Engineering", "People Ops", "Finance", "Design"]}
-                                icon={<GoListUnordered />}
-                            />
-                            <Dropdown
-                                label="Position"
-                                options={["Manager", "Developer", "Analyst", "Coordinator"]}
-                                icon={<GoListUnordered />}
-                            />
-                            <Dropdown
-                                label="Status"
-                                options={["Active", "Inactive"]}
-                                icon={<MdOutlineFilterList />}
-                            />
-
-                            <div className="ml-auto flex min-w-[3.4rem] items-center gap-[.1rem] rounded-[.14rem] border border-[#e2e8f4] bg-[#fbfcff] px-[.14rem] py-[.1rem] text-[#8d97b4]">
-                                <Search className="h-[.16rem] w-[.16rem]" />
-                                <input
-                                    className="w-full bg-transparent text-[.14rem] text-slate-700 outline-none placeholder:text-[#98a1bc]"
-                                    placeholder="Search employee, email, department"
+                        <div className="flex flex-col gap-[.12rem] border-b border-[#edf1f8] px-[.18rem] py-[.14rem] xl:flex-row xl:items-center xl:justify-between">
+                            <div className="flex flex-wrap items-center gap-[.1rem]">
+                                <Dropdown
+                                    label="Department"
+                                    options={["Engineering", "People Ops", "Finance", "Design"]}
+                                    icon={<GoListUnordered />}
+                                />
+                                <Dropdown
+                                    label="Position"
+                                    options={["Manager", "Developer", "Analyst", "Coordinator"]}
+                                    icon={<GoListUnordered />}
+                                />
+                                <Dropdown
+                                    label="Status"
+                                    options={["Active", "Inactive"]}
+                                    icon={<MdOutlineFilterList />}
                                 />
                             </div>
 
-                            <button
-                                onClick={() => setOpenExport(true)}
-                                className="inline-flex h-[.42rem] items-center gap-[.08rem] rounded-[.14rem] border border-[#e2e8f4] bg-white px-[.14rem] text-[.14rem] font-medium text-[#5c6b93] transition hover:bg-[#f8faff]"
-                            >
-                                <Download className="h-[.16rem] w-[.16rem]" />
-                                <span>Export</span>
-                            </button>
+                            <div className="flex flex-wrap items-center justify-end gap-[.1rem] xl:flex-nowrap">
+                                <div className="flex min-w-[3rem] items-center gap-[.1rem] rounded-[.14rem] border border-[#e2e8f4] bg-[#fbfcff] px-[.14rem] py-[.1rem] text-[#8d97b4] xl:w-[3.2rem]">
+                                    <Search className="h-[.16rem] w-[.16rem]" />
+                                    <input
+                                        className="w-full bg-transparent text-[.14rem] text-slate-700 outline-none placeholder:text-[#98a1bc]"
+                                        placeholder="Search employee, email, department"
+                                    />
+                                </div>
 
-                            <button
-                                onClick={handleAddEmployee}
-                                className="inline-flex h-[.42rem] items-center gap-[.08rem] rounded-[.14rem] bg-[linear-gradient(135deg,_#5365f6_0%,_#6d72ff_100%)] px-[.16rem] text-[.14rem] font-medium text-white shadow-[0_.12rem_.28rem_rgba(83,101,246,0.22)] transition hover:brightness-105"
-                            >
-                                <Plus className="h-[.16rem] w-[.16rem]" />
-                                <span>Add employee</span>
-                            </button>
+                                <button
+                                    onClick={() => setOpenExport(true)}
+                                    className="inline-flex h-[.42rem] items-center gap-[.08rem] rounded-[.14rem] border border-[#e2e8f4] bg-white px-[.14rem] text-[.14rem] font-medium text-[#5c6b93] transition hover:bg-[#f8faff]"
+                                >
+                                    <Download className="h-[.16rem] w-[.16rem]" />
+                                    <span>Export</span>
+                                </button>
+
+                                <button
+                                    onClick={handleAddEmployee}
+                                    title="Add employee"
+                                    aria-label="Add employee"
+                                    className="inline-flex h-[.42rem] w-[.42rem] shrink-0 items-center justify-center rounded-[.14rem] bg-[linear-gradient(135deg,_#5365f6_0%,_#6d72ff_100%)] text-white shadow-[0_.12rem_.28rem_rgba(83,101,246,0.22)] transition hover:brightness-105"
+                                >
+                                    <UserPlus className="h-[.18rem] w-[.18rem]" />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-[.12rem] p-[.18rem]">

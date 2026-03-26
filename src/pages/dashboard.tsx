@@ -1,7 +1,6 @@
 import { ArrowRight, CalendarDays, CheckCircle2, Clock3, DollarSign, Sparkles, Star, Users } from "lucide-react";
 import { Main } from "../layout/main";
 import FinanceCard from "../utils/attendance_chat";
-import EmployeeOverview from "../utils/pie";
 
 const topMetrics = [
     {
@@ -35,41 +34,6 @@ const topMetrics = [
         icon: Star,
         accent: "from-[#8d63ff] to-[#b088ff]",
         surface: "bg-[linear-gradient(135deg,_rgba(141,99,255,0.14),_rgba(176,136,255,0.03))]",
-    },
-];
-
-const leaveRequests = [
-    {
-        name: "Janet Lee",
-        role: "Product Design",
-        type: "Vacation leave",
-        date: "Apr 30, 2026",
-        days: "3 days",
-        avatar: 32,
-    },
-    {
-        name: "Adam Smith",
-        role: "Engineering",
-        type: "Sick leave",
-        date: "May 2, 2026",
-        days: "1 day",
-        avatar: 14,
-    },
-    {
-        name: "Samuel Brown",
-        role: "Operations",
-        type: "Emergency leave",
-        date: "May 4, 2026",
-        days: "2 days",
-        avatar: 51,
-    },
-    {
-        name: "Alice Turner",
-        role: "People Ops",
-        type: "Maternity leave",
-        date: "May 6, 2026",
-        days: "Start review",
-        avatar: 44,
     },
 ];
 
@@ -184,64 +148,13 @@ export const Dashboard = () => {
 
                     <div className="grid flex-1 gap-[.18rem] xl:grid-cols-[1.7fr_.82fr]">
                         <div className="grid min-h-0 gap-[.18rem]">
-                            <div className="grid min-h-0 gap-[.18rem] xl:grid-cols-[.88fr_1.12fr]">
-                                <div className="rounded-[.24rem] border border-[#e5e9f5] bg-white p-[.18rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <h3 className="text-[.22rem] font-semibold text-[#26305f]">
-                                                Leave requests
-                                            </h3>
-                                            <p className="mt-[.04rem] text-[.14rem] text-[#7a84a8]">
-                                                Approval queue for this week
-                                            </p>
-                                        </div>
-                                        <button className="inline-flex items-center gap-[.06rem] text-[.14rem] font-medium text-[#5b6cff]">
-                                            <span>View all</span>
-                                            <ArrowRight className="h-[.14rem] w-[.14rem]" />
-                                        </button>
-                                    </div>
-
-                                    <div className="mt-[.14rem] flex flex-col gap-[.08rem]">
-                                        {leaveRequests.map((request) => (
-                                            <div
-                                                key={`${request.name}-${request.date}`}
-                                                className="flex items-center justify-between rounded-[.16rem] border border-[#eef1f7] bg-[#fbfcff] px-[.12rem] py-[.12rem] transition hover:border-[#d9e1f8] hover:bg-white"
-                                            >
-                                                <div className="flex items-center gap-[.12rem]">
-                                                    <img
-                                                        src={`https://i.pravatar.cc/56?img=${request.avatar}`}
-                                                        className="h-[.46rem] w-[.46rem] rounded-full border border-[#dde3f5]"
-                                                        alt={request.name}
-                                                    />
-                                                    <div>
-                                                        <p className="text-[.16rem] font-semibold text-[#24305b]">
-                                                            {request.name}
-                                                        </p>
-                                                        <p className="text-[.13rem] text-[#7c86a8]">
-                                                            {request.role} · {request.type}
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div className="text-right">
-                                                    <p className="text-[.14rem] font-medium text-[#4d5b89]">
-                                                        {request.date}
-                                                    </p>
-                                                    <p className="text-[.13rem] text-[#8a93b0]">
-                                                        {request.days}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
+                            <div className="grid min-h-0 gap-[.18rem]">
                                 <div className="min-h-0 overflow-hidden rounded-[.24rem] border border-[#e5e9f5] bg-white shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
                                     <FinanceCard />
                                 </div>
                             </div>
 
-                            <div className="grid min-h-0 gap-[.18rem] xl:grid-cols-[1.35fr_.78fr]">
+                            <div className="grid min-h-0 gap-[.18rem]">
                                 <div className="rounded-[.24rem] border border-[#e5e9f5] bg-white p-[.18rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -318,10 +231,6 @@ export const Dashboard = () => {
                                             </div>
                                         ))}
                                     </div>
-                                </div>
-
-                                <div className="min-h-0 overflow-hidden rounded-[.24rem] border border-[#e5e9f5] bg-white shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
-                                    <EmployeeOverview />
                                 </div>
                             </div>
                         </div>

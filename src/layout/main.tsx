@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
     FaCheckCircle,
     FaClipboardList,
@@ -12,7 +12,7 @@ import { MdPlaylistAddCheckCircle } from "react-icons/md";
 import { PiHouseFill } from "react-icons/pi";
 import { RiLogoutCircleRFill } from "react-icons/ri";
 import { Link, useLocation, useNavigate } from "react-router";
-import { CalendarDays, Search, Sparkles } from "lucide-react";
+import { CalendarDays, MessageSquareText, Phone, Send, Sparkles, Video } from "lucide-react";
 
 interface MainProps {
     children: ReactNode;
@@ -25,8 +25,29 @@ type NavItem = {
     page: string;
 };
 
+type ChatThread = {
+    id: number;
+    name: string;
+    team: string;
+    message: string;
+    time: string;
+    unread: number;
+    avatar: number;
+};
+
+type ChatMessage = {
+    id: string;
+    text: string;
+    sender: "self" | "other";
+    timestamp?: string;
+};
+
 export const Main = ({ children }: MainProps) => {
+    const SIDEBAR_SCROLL_KEY = "hrms-sidebar-scroll";
     const [collapsed, setCollapsed] = useState(false);
+    const [chatMinimized, setChatMinimized] = useState(false);
+    const [activeThreadId, setActiveThreadId] = useState(1);
+    const [messageDraft, setMessageDraft] = useState("");
     const location = useLocation();
     const navigate = useNavigate();
     const page = location.pathname.split("/").pop() || "dashboard";
@@ -35,6 +56,7 @@ export const Main = ({ children }: MainProps) => {
     const profileImage = `${import.meta.env.BASE_URL}images/nobita.jpg`;
     const navRef = useRef<HTMLElement | null>(null);
     const activeItemRef = useRef<HTMLDivElement | null>(null);
+    const hasAlignedSidebarRef = useRef(false);
 
     const pageTitle =
         page.charAt(0).toUpperCase() + page.slice(1).replace("-", " ");
@@ -119,15 +141,167 @@ export const Main = ({ children }: MainProps) => {
             time: "48 min ago",
         },
     ];
+    const [messageThreads, setMessageThreads] = useState<ChatThread[]>([
+        {
+            id: 1,
+            name: "Mika Santos",
+            team: "People Ops",
+            message: "Need approval on the revised onboarding checklist before 4 PM.",
+            time: "2m",
+            unread: 2,
+            avatar: 26,
+        },
+        {
+            id: 2,
+            name: "Finance Team",
+            team: "Payroll",
+            message: "Overtime adjustments are ready for final review.",
+            time: "18m",
+            unread: 3,
+            avatar: 41,
+        },
+        {
+            id: 3,
+            name: "Lia Gomez",
+            team: "Recruitment",
+            message: "Candidate feedback for the HR Coordinator role is posted.",
+            time: "46m",
+            unread: 0,
+            avatar: 48,
+        },
+        {
+            id: 4,
+            name: "Operations Lead",
+            team: "Scheduling",
+            message: "Can we confirm the weekend shift coverage list?",
+            time: "1h",
+            unread: 0,
+            avatar: 12,
+        },
+    ]);
+    const [chatMessages, setChatMessages] = useState<Record<number, ChatMessage[]>>({
+        1: [
+            {
+                id: "1-other-1",
+                sender: "other",
+                text: "Need approval on the revised onboarding checklist before 4 PM.",
+            },
+            {
+                id: "1-self-1",
+                sender: "self",
+                text: "Payroll sign-off is on track. I just need the final checklist from your side.",
+            },
+            {
+                id: "1-meta",
+                sender: "other",
+                text: "Feb 12, 2026, 9:49 PM",
+                timestamp: "meta",
+            },
+            {
+                id: "1-other-2",
+                sender: "other",
+                text: "Hindi, may event kaming hinahandaan kaya naka meeting lang, ongoing pa dn",
+            },
+            {
+                id: "1-other-3",
+                sender: "other",
+                text: "Tol ok na bakit?",
+            },
+        ],
+        2: [
+            { id: "2-other-1", sender: "other", text: "Overtime adjustments are ready for final review." },
+            { id: "2-self-1", sender: "self", text: "Received. I will review the payroll exceptions in 15 minutes." },
+        ],
+        3: [
+            { id: "3-other-1", sender: "other", text: "Candidate feedback for the HR Coordinator role is posted." },
+            { id: "3-self-1", sender: "self", text: "Perfect. Please queue the shortlisted profiles for tomorrow." },
+        ],
+        4: [
+            { id: "4-other-1", sender: "other", text: "Can we confirm the weekend shift coverage list?" },
+            { id: "4-self-1", sender: "self", text: "Yes, send me the final names and I will lock the schedule." },
+        ],
+    });
+    const activeThread = messageThreads.find((thread) => thread.id === activeThreadId) ?? messageThreads[0];
+    const activeMessages = activeThread ? (chatMessages[activeThread.id] ?? []) : [];
+
+    useLayoutEffect(() => {
+        if (collapsed) {
+            hasAlignedSidebarRef.current = false;
+            return;
+        }
+
+        if (!navRef.current) return;
+
+        const savedScrollTop = window.sessionStorage.getItem(SIDEBAR_SCROLL_KEY);
+
+        if (savedScrollTop !== null) {
+            navRef.current.scrollTop = Number(savedScrollTop);
+            hasAlignedSidebarRef.current = true;
+            return;
+        }
+
+        if (hasAlignedSidebarRef.current || !activeItemRef.current) return;
+
+        hasAlignedSidebarRef.current = true;
+
+        const activeRect = activeItemRef.current.getBoundingClientRect();
+        const navRect = navRef.current.getBoundingClientRect();
+        const isAbove = activeRect.top < navRect.top;
+        const isBelow = activeRect.bottom > navRect.bottom;
+
+        if (isAbove || isBelow) {
+            activeItemRef.current.scrollIntoView({
+                block: "nearest",
+                inline: "nearest",
+            });
+        }
+    }, [activePath, collapsed]);
 
     useEffect(() => {
-        if (collapsed || !activeItemRef.current) return;
+        const navElement = navRef.current;
+        if (!navElement) return;
 
-        activeItemRef.current.scrollIntoView({
-            block: "center",
-            inline: "nearest",
-        });
-    }, [activePath, collapsed]);
+        const handleScroll = () => {
+            window.sessionStorage.setItem(SIDEBAR_SCROLL_KEY, String(navElement.scrollTop));
+        };
+
+        navElement.addEventListener("scroll", handleScroll);
+        return () => navElement.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    const handleSelectThread = (threadId: number) => {
+        setActiveThreadId(threadId);
+        setChatMinimized(false);
+        setMessageThreads((current) =>
+            current.map((thread) =>
+                thread.id === threadId ? { ...thread, unread: 0 } : thread,
+            ),
+        );
+    };
+
+    const handleSendMessage = () => {
+        const trimmed = messageDraft.trim();
+        if (!trimmed || !activeThread) return;
+
+        const nextMessage: ChatMessage = {
+            id: `${activeThread.id}-${Date.now()}`,
+            sender: "self",
+            text: trimmed,
+        };
+
+        setChatMessages((current) => ({
+            ...current,
+            [activeThread.id]: [...(current[activeThread.id] ?? []), nextMessage],
+        }));
+        setMessageThreads((current) =>
+            current.map((thread) =>
+                thread.id === activeThread.id
+                    ? { ...thread, message: trimmed, time: "now" }
+                    : thread,
+            ),
+        );
+        setMessageDraft("");
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -137,21 +311,6 @@ export const Main = ({ children }: MainProps) => {
     return (
         <div className="flex h-[100dvh] w-full overflow-hidden bg-[#f4f7fb]">
             <style>{`
-                @keyframes sidebarSelect {
-                    0% {
-                        opacity: 0.58;
-                        transform: translateX(-10px) scale(0.985);
-                    }
-                    60% {
-                        opacity: 1;
-                        transform: translateX(3px) scale(1);
-                    }
-                    100% {
-                        opacity: 1;
-                        transform: translateX(0) scale(1);
-                    }
-                }
-
                 @keyframes sidebarRail {
                     0% {
                         opacity: 0;
@@ -388,98 +547,254 @@ export const Main = ({ children }: MainProps) => {
                 </div>
             </aside>
 
-            <main className="flex h-full w-full flex-col overflow-hidden">
-                <header className="border-b border-slate-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfcff_100%)] px-[.28rem] py-[.18rem]">
-                    <div className="flex items-center justify-between gap-[.24rem]">
-                        <div className="flex items-start gap-[.18rem]">
-                            <div className="hidden h-[.52rem] w-[.52rem] items-center justify-center rounded-[.16rem] bg-[linear-gradient(135deg,_#eef2ff_0%,_#f7f9ff_100%)] text-[#5b6cff] ring-1 ring-[#dfe5fb] xl:flex">
-                                <Sparkles className="h-[.22rem] w-[.22rem]" />
-                            </div>
-
-                            <div>
-                                <div className="flex items-center gap-[.08rem]">
-                                    <span className="rounded-full bg-[#eef2ff] px-[.1rem] py-[.04rem] text-[.11rem] font-medium uppercase tracking-[0.14em] text-[#5b6cff]">
-                                        HR workspace
-                                    </span>
-                                    <span className="text-[.12rem] text-slate-400">
-                                        Live today
-                                    </span>
+            <div className="flex min-w-0 flex-1">
+                <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                    <header className="border-b border-slate-200/80 bg-[linear-gradient(180deg,_#fcfdff_0%,_#f8faff_100%)] px-[.22rem] py-[.16rem] xl:px-[.26rem]">
+                        <div className="flex flex-wrap items-center justify-between gap-[.14rem] xl:flex-nowrap">
+                            <div className="flex min-w-0 flex-1 items-center gap-[.14rem]">
+                                <div className="hidden h-[.48rem] w-[.48rem] shrink-0 items-center justify-center rounded-[.16rem] bg-[linear-gradient(135deg,_#eef2ff_0%,_#f6f8ff_100%)] text-[#5b6cff] ring-1 ring-[#dfe5fb] xl:flex">
+                                    <Sparkles className="h-[.2rem] w-[.2rem]" />
                                 </div>
 
-                                <h1 className="mt-[.06rem] text-[.38rem] font-semibold leading-none text-slate-800">
-                                    {pageTitle}
-                                </h1>
-                                <p className="mt-[.06rem] text-[.17rem] text-slate-500">
-                                    {pageDescriptions[page] || "Manage your HR workflow"}
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-[.08rem]">
+                                        <span className="rounded-full bg-[#eef2ff] px-[.09rem] py-[.035rem] text-[.105rem] font-semibold uppercase tracking-[0.16em] text-[#5b6cff]">
+                                            HR workspace
+                                        </span>
+                                        <span className="hidden text-[.12rem] text-slate-400 lg:inline">
+                                            Live today
+                                        </span>
+                                    </div>
+                                    <div className="mt-[.05rem] flex min-w-0 items-end gap-[.12rem]">
+                                        <h1 className="truncate text-[.34rem] font-semibold leading-none text-slate-800">
+                                            {pageTitle}
+                                        </h1>
+                                        <p className="hidden truncate pb-[.02rem] text-[.14rem] text-slate-500 2xl:block">
+                                            {pageDescriptions[page] || "Manage your HR workflow"}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex shrink-0 items-center gap-[.1rem]">
+                                <button className="inline-flex items-center gap-[.08rem] rounded-[.16rem] border border-[#dfe5fb] bg-white px-[.13rem] py-[.1rem] text-[.135rem] font-medium text-[#5b6cff] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff]">
+                                    <CalendarDays className="h-[.16rem] w-[.16rem]" />
+                                    <span>April 2026</span>
+                                </button>
+
+                                <div className="flex items-center gap-[.08rem] rounded-[.18rem] border border-[#dfe5f2] bg-white px-[.1rem] py-[.08rem] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)]">
+                                    <HeaderPopoverButton
+                                        icon={<FaConciergeBell />}
+                                        badge="3"
+                                        label="Requests / Tickets"
+                                        title="Open requests"
+                                        items={requestItems}
+                                        onViewAll={() => navigate("/requests")}
+                                    />
+                                    <HeaderPopoverButton
+                                        icon={<IoIosNotifications />}
+                                        badge="3"
+                                        label="Notifications"
+                                        title="Latest announcements"
+                                        items={notificationItems}
+                                        onViewAll={() => navigate("/announcements")}
+                                    />
+                                    <HeaderIconButton
+                                        icon={<IoMdSettings />}
+                                        label="Settings"
+                                        onClick={() => navigate("/settings")}
+                                    />
+                                </div>
+
+                                <button className="shrink-0 rounded-[.18rem] border border-[#dfe5f2] bg-white px-[.1rem] py-[.08rem] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff]">
+                                    <div className="flex items-center gap-[.1rem]">
+                                        <img
+                                            className="size-[.44rem] rounded-full border border-slate-200 object-cover"
+                                            src={profileImage}
+                                            alt="User"
+                                        />
+                                        <div className="hidden text-left leading-[1.1] 2xl:block">
+                                            <div className="text-[.145rem] font-semibold text-slate-700">
+                                                Virgilio Galicia
+                                            </div>
+                                            <div className="mt-[.03rem] text-[.115rem] uppercase tracking-[0.12em] text-slate-400">
+                                                Admin
+                                            </div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+
+                    <section className="flex-1 overflow-auto p-[.24rem]">
+                        <div className="h-full overflow-hidden rounded-[.18rem] border border-slate-200 bg-white shadow-[0_.04rem_.18rem_rgba(15,23,42,0.06)]">
+                            {children}
+                        </div>
+                    </section>
+                </main>
+
+                <aside className="relative hidden h-full w-[3.02rem] shrink-0 border-l border-[#dde4f2] bg-[linear-gradient(180deg,_#fbfcff_0%,_#f4f7fd_100%)] 2xl:flex 2xl:flex-col">
+                    <div className="border-b border-[#e6ebf5] px-[.18rem] py-[.18rem]">
+                        <div className="flex items-center justify-between gap-[.12rem]">
+                            <h2 className="text-[.2rem] font-semibold text-[#25315c]">
+                                Contacts
+                            </h2>
+                            <div className="flex items-center gap-[.06rem] text-[#7d89a8]">
+                                <button className="inline-flex h-[.34rem] w-[.34rem] items-center justify-center rounded-full transition hover:bg-white">
+                                    <MessageSquareText className="h-[.16rem] w-[.16rem]" />
+                                </button>
+                                <button className="inline-flex h-[.34rem] w-[.34rem] items-center justify-center rounded-full text-[.18rem] leading-none transition hover:bg-white">
+                                    …
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="mt-[.14rem] rounded-[.18rem] border border-[#e2e8f5] bg-white px-[.12rem] py-[.12rem]">
+                            <p className="text-[.11rem] font-semibold uppercase tracking-[0.14em] text-[#8a96b7]">
+                                Birthdays
+                            </p>
+                            <div className="mt-[.08rem] flex items-start gap-[.09rem] text-[.125rem] leading-[1.5] text-[#53648f]">
+                                <span className="text-[.2rem] leading-none">🎁</span>
+                                <p>
+                                    <span className="font-semibold text-[#25315c]">Beth Blanco</span> and
+                                    <span className="font-semibold text-[#25315c]"> Rj Nickosh Gabatino</span> have birthdays today.
                                 </p>
                             </div>
                         </div>
+                    </div>
 
-                        <div className="flex items-center gap-[.12rem]">
-                            <div className="hidden min-w-[3.4rem] items-center gap-[.1rem] rounded-[.16rem] border border-slate-200 bg-white px-[.14rem] py-[.11rem] text-slate-400 shadow-sm lg:flex xl:min-w-[4.1rem]">
-                                <Search className="h-[.17rem] w-[.17rem]" />
-                                <input
-                                    className="w-full bg-transparent text-[.14rem] text-slate-700 outline-none placeholder:text-slate-400"
-                                    placeholder="Search employees, payroll, requests"
-                                />
-                            </div>
-
-                            <button className="hidden items-center gap-[.08rem] rounded-[.14rem] border border-[#dfe5fb] bg-[#f8faff] px-[.14rem] py-[.1rem] text-[.14rem] font-medium text-[#5b6cff] transition hover:bg-[#eef2ff] xl:inline-flex">
-                                <CalendarDays className="h-[.16rem] w-[.16rem]" />
-                                <span>April 2026</span>
-                            </button>
-
-                            <div className="flex items-center gap-[.08rem] rounded-[.18rem] border border-slate-200 bg-white/90 px-[.1rem] py-[.08rem] shadow-sm">
-                                <HeaderPopoverButton
-                                    icon={<FaConciergeBell />}
-                                    badge="3"
-                                    label="Requests / Tickets"
-                                    title="Open requests"
-                                    items={requestItems}
-                                    onViewAll={() => navigate("/requests")}
-                                />
-                                <HeaderPopoverButton
-                                    icon={<IoIosNotifications />}
-                                    badge="3"
-                                    label="Notifications"
-                                    title="Latest announcements"
-                                    items={notificationItems}
-                                    onViewAll={() => navigate("/announcements")}
-                                />
-                                <HeaderIconButton
-                                    icon={<IoMdSettings />}
-                                    label="Settings"
-                                    onClick={() => navigate("/settings")}
-                                />
-                            </div>
-
-                            <div className="h-[.38rem] w-px bg-slate-200" />
-
-                            <button className="flex items-center gap-[.12rem] rounded-[.18rem] border border-slate-200 bg-white px-[.1rem] py-[.08rem] shadow-sm transition hover:bg-slate-50">
-                                <img
-                                    className="size-[.48rem] rounded-full border border-slate-200 object-cover"
-                                    src={profileImage}
-                                    alt="User"
-                                />
-                                <div className="text-left leading-[1.1]">
-                                    <div className="text-[.15rem] font-semibold text-slate-700">
-                                        Virgilio Galicia
+                    <div className="min-h-0 flex-1 overflow-y-auto px-[.14rem] py-[.14rem] pb-[2.3rem]">
+                        <div className="space-y-[.04rem]">
+                            {messageThreads.map((thread) => (
+                                <button
+                                    key={`${thread.name}-${thread.time}`}
+                                    type="button"
+                                    onClick={() => handleSelectThread(thread.id)}
+                                    className={`flex w-full items-center gap-[.1rem] rounded-[.16rem] px-[.1rem] py-[.08rem] text-left transition ${
+                                        activeThreadId === thread.id ? "bg-white shadow-[0_.06rem_.14rem_rgba(15,23,42,0.06)]" : "hover:bg-white/92"
+                                    }`}
+                                >
+                                    <div className="relative shrink-0">
+                                        <img
+                                            src={`https://i.pravatar.cc/56?img=${thread.avatar}`}
+                                            className="h-[.38rem] w-[.38rem] rounded-full border border-[#dbe2f2] object-cover"
+                                            alt={thread.name}
+                                        />
+                                        <span className="absolute bottom-0 right-0 h-[.09rem] w-[.09rem] rounded-full bg-[#19b48a] ring-[.02rem] ring-[#f7f9ff]" />
                                     </div>
-                                    <div className="mt-[.03rem] text-[.12rem] uppercase tracking-[0.12em] text-slate-400">
-                                        Admin
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-[.14rem] font-medium text-[#33436b]">
+                                            {thread.name}
+                                        </p>
                                     </div>
-                                </div>
-                            </button>
+                                    {thread.unread > 0 && (
+                                        <span className="flex h-[.18rem] min-w-[.18rem] items-center justify-center rounded-full bg-[#ff4c68] px-[.03rem] text-[.09rem] font-semibold text-white">
+                                            {thread.unread}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
                         </div>
                     </div>
-                </header>
 
-                <section className="flex-1 overflow-auto p-[.24rem]">
-                    <div className="h-full overflow-hidden rounded-[.18rem] border border-slate-200 bg-white shadow-[0_.04rem_.18rem_rgba(15,23,42,0.06)]">
-                        {children}
+                        <div className="pointer-events-none absolute bottom-[.12rem] left-[.08rem] right-[.08rem]">
+                            <div className="pointer-events-auto ml-auto w-[2.62rem] overflow-hidden rounded-[.18rem] border border-[#d7ddf0] bg-white shadow-[0_.14rem_.34rem_rgba(15,23,42,0.16)]">
+                            <button
+                                type="button"
+                                onClick={() => setChatMinimized((current) => !current)}
+                                className="flex w-full items-center justify-between gap-[.08rem] bg-[linear-gradient(135deg,_#f7f9ff_0%,_#eef2ff_100%)] px-[.1rem] py-[.08rem] text-left"
+                            >
+                                <div className="flex min-w-0 items-center gap-[.08rem]">
+                                    <img
+                                        src={`https://i.pravatar.cc/56?img=${activeThread.avatar}`}
+                                        className="h-[.28rem] w-[.28rem] rounded-full border border-[#dbe2f2] object-cover"
+                                        alt={activeThread.name}
+                                    />
+                                    <div className="min-w-0">
+                                        <p className="truncate text-[.128rem] font-semibold text-[#25315c]">
+                                            {activeThread.name}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-[.04rem] text-[#6b53ff]">
+                                    {!chatMinimized && (
+                                        <>
+                                            <span className="inline-flex h-[.26rem] w-[.26rem] items-center justify-center rounded-full transition hover:bg-white/75">
+                                                <Phone className="h-[.12rem] w-[.12rem]" />
+                                            </span>
+                                            <span className="inline-flex h-[.26rem] w-[.26rem] items-center justify-center rounded-full transition hover:bg-white/75">
+                                                <Video className="h-[.12rem] w-[.12rem]" />
+                                            </span>
+                                        </>
+                                    )}
+                                    <span className="inline-flex h-[.26rem] w-[.26rem] items-center justify-center rounded-full text-[.14rem] leading-none transition hover:bg-white/75">
+                                        {chatMinimized ? "▴" : "▾"}
+                                    </span>
+                                </div>
+                            </button>
+
+                            {!chatMinimized && (
+                                <div className="bg-[#ffffff]">
+                                    <div className="max-h-[2.6rem] overflow-y-auto px-[.1rem] py-[.1rem]">
+                                        {activeMessages.map((message) =>
+                                            message.timestamp === "meta" ? (
+                                                <p
+                                                    key={message.id}
+                                                    className="mt-[.1rem] text-center text-[.102rem] text-[#97a2bc]"
+                                                >
+                                                    {message.text}
+                                                </p>
+                                            ) : (
+                                                <div
+                                                    key={message.id}
+                                                    className={`mt-[.08rem] ${message.sender === "self" ? "ml-auto max-w-[1.74rem]" : "max-w-[1.82rem]"}`}
+                                                >
+                                                    <div
+                                                        className={`rounded-[.14rem] px-[.09rem] py-[.08rem] text-[.118rem] leading-[1.45] ${
+                                                            message.sender === "self"
+                                                                ? "rounded-tr-[.06rem] bg-[linear-gradient(135deg,_#8a38ff_0%,_#5b6cff_100%)] text-white"
+                                                                : "rounded-tl-[.06rem] bg-[#f2f4fa] text-[#53648f]"
+                                                        }`}
+                                                    >
+                                                        {message.text}
+                                                    </div>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-[#e7ebf5] px-[.08rem] py-[.08rem]">
+                                        <div className="flex items-center gap-[.06rem]">
+                                            <div className="flex min-w-0 flex-1 items-center gap-[.06rem] rounded-full bg-[#f2f4fa] px-[.1rem] py-[.07rem]">
+                                                <input
+                                                    value={messageDraft}
+                                                    onChange={(event) => setMessageDraft(event.target.value)}
+                                                    onKeyDown={(event) => {
+                                                        if (event.key === "Enter") {
+                                                            event.preventDefault();
+                                                            handleSendMessage();
+                                                        }
+                                                    }}
+                                                    className="w-full bg-transparent text-[.12rem] text-[#33436b] outline-none placeholder:text-[#8f9bbb]"
+                                                    placeholder="Aa"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSendMessage}
+                                                    className="inline-flex h-[.24rem] w-[.24rem] items-center justify-center rounded-full bg-[#5b6cff] text-white"
+                                                >
+                                                    <Send className="h-[.11rem] w-[.11rem]" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </section>
-            </main>
+                </aside>
+            </div>
         </div>
     );
 };
@@ -514,7 +829,7 @@ function SidebarItem({
                     : "justify-start gap-[.12rem] px-[.14rem] py-[.12rem]"
             } ${
                 status
-                    ? "animate-[sidebarSelect_320ms_cubic-bezier(0.22,1,0.36,1)] bg-[linear-gradient(90deg,_rgba(255,255,255,0.16)_0%,_rgba(255,255,255,0.08)_100%)] text-white shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.14),0_.06rem_.18rem_rgba(0,0,0,0.14)]"
+                    ? "bg-[linear-gradient(90deg,_rgba(255,255,255,0.16)_0%,_rgba(255,255,255,0.08)_100%)] text-white shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.14),0_.06rem_.18rem_rgba(0,0,0,0.14)]"
                     : tone === "danger"
                         ? "text-rose-100/78 hover:bg-rose-400/10 hover:text-white"
                         : "text-white/70 hover:bg-white/7 hover:text-white"
@@ -531,7 +846,7 @@ function SidebarItem({
                                       : "border-transparent bg-transparent group-hover:border-white/8 group-hover:bg-white/8"
                           } text-[.2rem]`
                         : "text-[.2rem]"
-                } ${status ? "animate-[sidebarContent_260ms_cubic-bezier(0.22,1,0.36,1)]" : ""}`}
+                }`}
             >
                 {status && !collapsed && (
                     <span className="absolute -left-[.11rem] h-[.24rem] w-[.03rem] origin-center rounded-full bg-white/85 animate-[sidebarRail_260ms_cubic-bezier(0.22,1,0.36,1)]" />
@@ -544,9 +859,7 @@ function SidebarItem({
 
             {!collapsed && (
                 <span
-                    className={`text-[.16rem] font-medium tracking-[0.01em] transition-transform duration-300 ${
-                        status ? "animate-[sidebarContent_260ms_cubic-bezier(0.22,1,0.36,1)]" : ""
-                    }`}
+                    className="text-[.16rem] font-medium tracking-[0.01em] transition-transform duration-300"
                 >
                     {text}
                 </span>
