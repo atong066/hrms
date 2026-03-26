@@ -735,8 +735,8 @@ export const Main = ({ children }: MainProps) => {
                             </button>
 
                             {!chatMinimized && (
-                                <div className="bg-[#ffffff]">
-                                    <div className="max-h-[2.6rem] overflow-y-auto px-[.1rem] py-[.1rem]">
+                                <div className="flex h-[3.82rem] flex-col bg-[#ffffff]">
+                                    <div className="min-h-0 flex-1 overflow-y-auto px-[.1rem] py-[.1rem]">
                                         {activeMessages.map((message) =>
                                             message.timestamp === "meta" ? (
                                                 <p
@@ -764,7 +764,7 @@ export const Main = ({ children }: MainProps) => {
                                         )}
                                     </div>
 
-                                    <div className="border-t border-[#e7ebf5] px-[.08rem] py-[.08rem]">
+                                    <div className="shrink-0 border-t border-[#e7ebf5] px-[.08rem] py-[.08rem]">
                                         <div className="flex items-center gap-[.06rem]">
                                             <div className="flex min-w-0 flex-1 items-center gap-[.06rem] rounded-full bg-[#f2f4fa] px-[.1rem] py-[.07rem]">
                                                 <input
