@@ -66,36 +66,36 @@ export const ModuleWorkspace = ({
 }: ModuleWorkspaceProps) => {
     return (
         <Main>
-            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.28rem]">
+            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.14rem] md:p-[.2rem] xl:p-[.28rem]">
                 <div className="flex min-h-full flex-col gap-[.18rem]">
                     {bannerVariant === "compact" ? (
-                        <div className="rounded-[.22rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f8faff_100%)] px-[.18rem] py-[.16rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
+                        <div className="rounded-[.18rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f8faff_100%)] px-[.14rem] py-[.14rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)] md:rounded-[.22rem] md:px-[.18rem] md:py-[.16rem]">
                             <div className="flex flex-col gap-[.14rem] xl:flex-row xl:items-start xl:justify-between">
                                 <div className="max-w-[5.1rem]">
-                                    <p className="text-[.125rem] font-medium uppercase tracking-[0.18em] text-[#6c78a6]">
+                                    <p className="text-[.11rem] font-medium uppercase tracking-[0.16em] text-[#6c78a6] md:text-[.125rem] md:tracking-[0.18em]">
                                         {eyebrow}
                                     </p>
-                                    <h2 className="mt-[.05rem] font-['Montserrat'] text-[.3rem] font-semibold leading-[1.08] text-[#232b57]">
+                                    <h2 className="mt-[.05rem] font-['Montserrat'] text-[.24rem] font-semibold leading-[1.08] text-[#232b57] md:text-[.3rem]">
                                         {title}
                                     </h2>
-                                    <p className="mt-[.06rem] text-[.14rem] leading-[1.55] text-[#6c7598]">
+                                    <p className="mt-[.06rem] text-[.125rem] leading-[1.55] text-[#6c7598] md:text-[.14rem]">
                                         {description}
                                     </p>
                                 </div>
 
-                                <div className="grid gap-[.08rem] sm:grid-cols-3 xl:min-w-[4.4rem] xl:max-w-[5.4rem]">
+                                <div className="grid gap-[.08rem] sm:grid-cols-2 xl:min-w-[4.4rem] xl:max-w-[5.4rem] xl:grid-cols-3">
                                     {stats.map((stat) => (
                                         <div
                                             key={stat.label}
-                                            className={`rounded-[.16rem] border border-[#e7ebf6] px-[.12rem] py-[.11rem] ${stat.accent}`}
+                                            className={`rounded-[.14rem] border border-[#e7ebf6] px-[.11rem] py-[.1rem] ${stat.accent} md:rounded-[.16rem] md:px-[.12rem] md:py-[.11rem]`}
                                         >
-                                            <p className="text-[.115rem] uppercase tracking-[0.08em] text-[#7d86a8]">
+                                            <p className="text-[.105rem] uppercase tracking-[0.08em] text-[#7d86a8] md:text-[.115rem]">
                                                 {stat.label}
                                             </p>
-                                            <p className="mt-[.04rem] font-['Montserrat'] text-[.24rem] font-semibold leading-none text-[#232b57]">
+                                            <p className="mt-[.04rem] font-['Montserrat'] text-[.21rem] font-semibold leading-none text-[#232b57] md:text-[.24rem]">
                                                 {stat.value}
                                             </p>
-                                            <p className="mt-[.05rem] text-[.115rem] leading-[1.45] text-[#7280a7]">
+                                            <p className="mt-[.05rem] text-[.11rem] leading-[1.45] text-[#7280a7] md:text-[.115rem]">
                                                 {stat.detail}
                                             </p>
                                         </div>
@@ -149,17 +149,17 @@ export const ModuleWorkspace = ({
                         />
                     </div>
 
-                    <div className="rounded-[.24rem] border border-[#e5e9f5] bg-white p-[.18rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
+                    <div className="rounded-[.18rem] border border-[#e5e9f5] bg-white p-[.14rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)] md:rounded-[.24rem] md:p-[.18rem]">
                         <div>
-                            <h3 className="text-[.2rem] font-semibold text-[#253158]">{tableTitle}</h3>
-                            <p className="mt-[.04rem] text-[.13rem] text-[#7481a4]">{tableDescription}</p>
+                            <h3 className="text-[.18rem] font-semibold text-[#253158] md:text-[.2rem]">{tableTitle}</h3>
+                            <p className="mt-[.04rem] text-[.12rem] text-[#7481a4] md:text-[.13rem]">{tableDescription}</p>
                         </div>
 
-                        {tableToolbar ? <div className="mt-[.14rem]">{tableToolbar}</div> : null}
+                        {tableToolbar ? <div className="mt-[.14rem] overflow-x-auto">{tableToolbar}</div> : null}
 
                         <div className="mt-[.14rem] overflow-hidden rounded-[.18rem] border border-[#edf1f8] bg-white">
                             <div className="max-h-[4.8rem] overflow-auto">
-                                <table className="w-full table-fixed text-left">
+                                <table className="min-w-[7rem] w-full table-fixed text-left md:min-w-0">
                                     <thead className="sticky top-0 z-10 bg-[#f8faff]">
                                         <tr className="border-b border-[#edf1f8] text-[.13rem] font-medium uppercase tracking-[0.08em] text-[#7c86a8]">
                                             {columns.map((column) => (

@@ -251,25 +251,25 @@ export const EmployeeOverview = () => {
                 </div>
             ) : null}
 
-            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.28rem]">
+            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.14rem] md:p-[.2rem] xl:p-[.28rem]">
                 <div className="flex min-h-full flex-col gap-[.18rem]">
-                    <div className="rounded-[.22rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f8faff_100%)] px-[.18rem] py-[.15rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
+                    <div className="rounded-[.18rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f8faff_100%)] px-[.14rem] py-[.14rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)] md:rounded-[.22rem] md:px-[.18rem] md:py-[.15rem]">
                         <div className="flex flex-col gap-[.14rem] xl:flex-row xl:items-end xl:justify-between">
                             <div className="max-w-[5.4rem]">
-                                <p className="text-[.118rem] font-medium uppercase tracking-[0.18em] text-[#6c78a6]">
+                                <p className="text-[.11rem] font-medium uppercase tracking-[0.16em] text-[#6c78a6] md:text-[.118rem] md:tracking-[0.18em]">
                                     People operations
                                 </p>
                                 <div className="mt-[.03rem] flex flex-col gap-[.04rem] xl:flex-row xl:items-end xl:gap-[.12rem]">
-                                    <h2 className="font-['Montserrat'] text-[.28rem] font-semibold leading-[1.08] text-[#232b57]">
+                                    <h2 className="font-['Montserrat'] text-[.24rem] font-semibold leading-[1.08] text-[#232b57] md:text-[.28rem]">
                                         Team directory and workforce status
                                     </h2>
-                                    <p className="max-w-[3.8rem] pb-[.02rem] text-[.132rem] leading-[1.5] text-[#6c7598]">
+                                    <p className="max-w-[3.8rem] pb-[.02rem] text-[.122rem] leading-[1.5] text-[#6c7598] md:text-[.132rem]">
                                         Review employee status, open profiles, and manage staffing actions from one clear workspace.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="grid gap-[.08rem] sm:grid-cols-3 xl:min-w-[4.8rem] xl:max-w-[5.6rem] xl:flex-1">
+                            <div className="grid gap-[.08rem] sm:grid-cols-2 xl:min-w-[4.8rem] xl:max-w-[5.6rem] xl:flex-1 xl:grid-cols-3">
                                 {summaryCards.map((card) => {
                                     const Icon = card.icon;
 
@@ -297,8 +297,8 @@ export const EmployeeOverview = () => {
                         </div>
                     </div>
 
-                    <div className="rounded-[.24rem] border border-[#e5e9f5] bg-white shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
-                        <div className="flex flex-col gap-[.12rem] border-b border-[#edf1f8] px-[.18rem] py-[.14rem] xl:flex-row xl:items-center xl:justify-between">
+                    <div className="rounded-[.18rem] border border-[#e5e9f5] bg-white shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)] md:rounded-[.24rem]">
+                        <div className="flex flex-col gap-[.12rem] border-b border-[#edf1f8] px-[.14rem] py-[.14rem] xl:flex-row xl:items-center xl:justify-between md:px-[.18rem]">
                             <div className="flex flex-wrap items-center gap-[.1rem]">
                                 <Dropdown
                                     label="Department"
@@ -318,7 +318,7 @@ export const EmployeeOverview = () => {
                             </div>
 
                             <div className="flex flex-wrap items-center justify-end gap-[.1rem] xl:flex-nowrap">
-                                <div className="flex min-w-[3rem] items-center gap-[.1rem] rounded-[.14rem] border border-[#e2e8f4] bg-[#fbfcff] px-[.14rem] py-[.1rem] text-[#8d97b4] xl:w-[3.2rem]">
+                                <div className="flex w-full min-w-0 items-center gap-[.1rem] rounded-[.14rem] border border-[#e2e8f4] bg-[#fbfcff] px-[.14rem] py-[.1rem] text-[#8d97b4] sm:min-w-[3rem] xl:w-[3.2rem]">
                                     <Search className="h-[.16rem] w-[.16rem]" />
                                     <input
                                         className="w-full bg-transparent text-[.14rem] text-slate-700 outline-none placeholder:text-[#98a1bc]"
@@ -345,7 +345,7 @@ export const EmployeeOverview = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-[.12rem] p-[.18rem]">
+                        <div className="flex flex-col gap-[.12rem] p-[.14rem] md:p-[.18rem]">
                             {selected.length > 0 && (
                                 <div className="flex items-center justify-between rounded-[.16rem] border border-[#dbe4ff] bg-[#f4f7ff] px-[.14rem] py-[.12rem]">
                                     <div className="text-[.14rem] text-[#51618f]">
@@ -370,7 +370,7 @@ export const EmployeeOverview = () => {
 
                             <div className="overflow-hidden rounded-[.18rem] border border-[#edf1f8] bg-white">
                                 <div className="max-h-[4.4rem] overflow-auto">
-                                    <table className="w-full table-fixed text-left">
+                                    <table className="min-w-[8.4rem] w-full table-fixed text-left xl:min-w-0">
                                         <thead className="sticky top-0 z-10 bg-[#f8faff]">
                                             <tr className="border-b border-[#edf1f8] text-[.13rem] font-medium uppercase tracking-[0.08em] text-[#7c86a8]">
                                                 <th className="w-[.42rem] px-[.1rem] py-[.1rem]">

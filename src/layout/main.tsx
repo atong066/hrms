@@ -45,6 +45,7 @@ type ChatMessage = {
 export const Main = ({ children }: MainProps) => {
     const SIDEBAR_SCROLL_KEY = "hrms-sidebar-scroll";
     const [collapsed, setCollapsed] = useState(false);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
     const [chatMinimized, setChatMinimized] = useState(false);
     const [activeThreadId, setActiveThreadId] = useState(1);
     const [messageDraft, setMessageDraft] = useState("");
@@ -52,6 +53,7 @@ export const Main = ({ children }: MainProps) => {
     const navigate = useNavigate();
     const page = location.pathname.split("/").pop() || "dashboard";
     const activePath = location.pathname || "/dashboard";
+    const sidebarCollapsed = collapsed && !mobileNavOpen;
     const logoImage = `${import.meta.env.BASE_URL}images/logo.png`;
     const profileImage = `${import.meta.env.BASE_URL}images/nobita.jpg`;
     const navRef = useRef<HTMLElement | null>(null);
@@ -269,6 +271,23 @@ export const Main = ({ children }: MainProps) => {
         return () => navElement.removeEventListener("scroll", handleScroll);
     }, []);
 
+    useEffect(() => {
+        setMobileNavOpen(false);
+    }, [activePath]);
+
+    useEffect(() => {
+        const originalOverflow = document.body.style.overflow;
+        if (mobileNavOpen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = originalOverflow;
+        }
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, [mobileNavOpen]);
+
     const handleSelectThread = (threadId: number) => {
         setActiveThreadId(threadId);
         setChatMinimized(false);
@@ -344,16 +363,27 @@ export const Main = ({ children }: MainProps) => {
                     }
                 }
             `}</style>
+            {mobileNavOpen ? (
+                <button
+                    type="button"
+                    aria-label="Close navigation"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="absolute inset-0 z-40 bg-[#0f172a]/42 backdrop-blur-[2px] xl:hidden"
+                />
+            ) : null}
+
             <aside
-                className={`relative h-full shrink-0 overflow-hidden border-r border-[#dbe2fb]/20 bg-[linear-gradient(180deg,_#1b2250_0%,_#232b63_38%,_#322b81_100%)] transition-all duration-300 ${
-                    collapsed ? "w-[1.02rem]" : "w-[2.72rem]"
+                className={`absolute inset-y-0 left-0 z-50 w-[2.72rem] overflow-hidden border-r border-[#dbe2fb]/20 bg-[linear-gradient(180deg,_#1b2250_0%,_#232b63_38%,_#322b81_100%)] transition-all duration-300 xl:relative xl:z-auto xl:translate-x-0 ${
+                    sidebarCollapsed ? "xl:w-[1.02rem]" : "xl:w-[2.72rem]"
+                } ${
+                    mobileNavOpen ? "translate-x-0" : "-translate-x-full xl:translate-x-0"
                 }`}
             >
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(135,154,255,0.28),_transparent_26%),radial-gradient(circle_at_bottom,_rgba(115,78,255,0.18),_transparent_28%)]" />
 
                 <div className="relative flex h-full flex-col">
                     <div className="flex items-center justify-between px-[.18rem] py-[.18rem]">
-                        {!collapsed ? (
+                        {!sidebarCollapsed ? (
                             <>
                                 <div className="flex items-center gap-[.12rem]">
                                     <img
@@ -373,13 +403,13 @@ export const Main = ({ children }: MainProps) => {
 
                                 <button
                                     onClick={() => setCollapsed(true)}
-                                    className="rounded-[.12rem] border border-white/10 bg-white/6 p-[.06rem] text-white/82 transition hover:bg-white/12"
+                                    className="hidden rounded-[.12rem] border border-white/10 bg-white/6 p-[.06rem] text-white/82 transition hover:bg-white/12 xl:block"
                                 >
                                     <HiMenu size={20} />
                                 </button>
                             </>
                         ) : (
-                            <div className="mx-auto flex w-full flex-col items-center gap-[.12rem] animate-[collapsedDock_240ms_cubic-bezier(0.22,1,0.36,1)]">
+                            <div className="mx-auto hidden w-full flex-col items-center gap-[.12rem] animate-[collapsedDock_240ms_cubic-bezier(0.22,1,0.36,1)] xl:flex">
                                 <button
                                     onClick={() => setCollapsed(false)}
                                     className="flex h-[.34rem] w-[.34rem] items-center justify-center rounded-full border border-white/12 bg-white/8 text-white/82 transition hover:bg-white/14"
@@ -406,7 +436,7 @@ export const Main = ({ children }: MainProps) => {
                         )}
                     </div>
 
-                    {!collapsed && (
+                    {!sidebarCollapsed && (
                         <div className="relative mx-[.14rem] mb-[.18rem] rounded-[.22rem] border border-white/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.12)_0%,_rgba(255,255,255,0.06)_100%)] px-[.14rem] py-[.14rem] backdrop-blur-sm shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.05)]">
                             <div className="flex items-center gap-[.12rem]">
                                 <img
@@ -433,7 +463,7 @@ export const Main = ({ children }: MainProps) => {
 
                     <nav ref={navRef} className="relative flex flex-1 flex-col gap-[.16rem] overflow-y-auto px-[.1rem] pb-[.12rem]">
                         <div className="space-y-[.04rem]">
-                            {!collapsed && (
+                            {!sidebarCollapsed && (
                                 <p className="px-[.14rem] pb-[.04rem] text-[.11rem] uppercase tracking-[0.18em] text-white/35">
                                     Workspace
                                 </p>
@@ -442,7 +472,7 @@ export const Main = ({ children }: MainProps) => {
                             {workspaceLinks.map((item) => (
                                 <SidebarItem
                                     key={item.to}
-                                    collapsed={collapsed}
+                                    collapsed={sidebarCollapsed}
                                     to={item.to}
                                     icon={item.icon}
                                     status={activePath === item.to}
@@ -453,7 +483,7 @@ export const Main = ({ children }: MainProps) => {
                         </div>
 
                         <div className="space-y-[.04rem]">
-                            {!collapsed && (
+                            {!sidebarCollapsed && (
                                 <p className="px-[.14rem] pb-[.04rem] text-[.11rem] uppercase tracking-[0.18em] text-white/35">
                                     Management
                                 </p>
@@ -462,7 +492,7 @@ export const Main = ({ children }: MainProps) => {
                             {managementLinks.map((item) => (
                                 <SidebarItem
                                     key={item.to}
-                                    collapsed={collapsed}
+                                    collapsed={sidebarCollapsed}
                                     to={item.to}
                                     icon={item.icon}
                                     status={activePath === item.to}
@@ -473,7 +503,7 @@ export const Main = ({ children }: MainProps) => {
                         </div>
 
                         <div className="space-y-[.04rem]">
-                            {!collapsed && (
+                            {!sidebarCollapsed && (
                                 <p className="px-[.14rem] pb-[.04rem] text-[.11rem] uppercase tracking-[0.18em] text-white/35">
                                     Communication
                                 </p>
@@ -482,7 +512,7 @@ export const Main = ({ children }: MainProps) => {
                             {communicationLinks.map((item) => (
                                 <SidebarItem
                                     key={item.to}
-                                    collapsed={collapsed}
+                                    collapsed={sidebarCollapsed}
                                     to={item.to}
                                     icon={item.icon}
                                     status={activePath === item.to}
@@ -493,7 +523,7 @@ export const Main = ({ children }: MainProps) => {
                         </div>
 
                         <div className="space-y-[.04rem]">
-                            {!collapsed && (
+                            {!sidebarCollapsed && (
                                 <p className="px-[.14rem] pb-[.04rem] text-[.11rem] uppercase tracking-[0.18em] text-white/35">
                                     System
                                 </p>
@@ -502,7 +532,7 @@ export const Main = ({ children }: MainProps) => {
                             {systemLinks.map((item) => (
                                 <SidebarItem
                                     key={item.to}
-                                    collapsed={collapsed}
+                                    collapsed={sidebarCollapsed}
                                     to={item.to}
                                     icon={item.icon}
                                     status={activePath === item.to}
@@ -513,7 +543,7 @@ export const Main = ({ children }: MainProps) => {
                         </div>
 
                         <div className="mt-auto space-y-[.08rem]">
-                            {!collapsed && (
+                            {!sidebarCollapsed && (
                                 <div className="mx-[.08rem] rounded-[.18rem] border border-white/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.09)_0%,_rgba(255,255,255,0.04)_100%)] px-[.14rem] py-[.12rem] text-[.13rem] text-white/72">
                                     <p className="font-medium text-white/84">HR Management System</p>
                                     <p className="mt-[.04rem] leading-[1.45] text-white/48">
@@ -522,7 +552,7 @@ export const Main = ({ children }: MainProps) => {
                                 </div>
                             )}
 
-                            {collapsed && (
+                            {sidebarCollapsed && (
                                 <div className="mx-auto flex w-[.58rem] flex-col items-center gap-[.08rem] rounded-[.2rem] border border-white/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.11)_0%,_rgba(255,255,255,0.04)_100%)] px-[.08rem] py-[.1rem] text-white/72 animate-[collapsedDock_240ms_cubic-bezier(0.22,1,0.36,1)]">
                                     <img
                                         className="h-[.24rem] w-[.24rem] rounded-full border border-white/20 object-cover"
@@ -534,7 +564,7 @@ export const Main = ({ children }: MainProps) => {
                             )}
 
                             <SidebarItem
-                                collapsed={collapsed}
+                                collapsed={sidebarCollapsed}
                                 to="/"
                                 icon={<RiLogoutCircleRFill />}
                                 status={false}
@@ -549,86 +579,118 @@ export const Main = ({ children }: MainProps) => {
 
             <div className="flex min-w-0 flex-1">
                 <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
-                    <header className="border-b border-slate-200/80 bg-[linear-gradient(180deg,_#fcfdff_0%,_#f8faff_100%)] px-[.22rem] py-[.16rem] xl:px-[.26rem]">
-                        <div className="flex flex-wrap items-center justify-between gap-[.14rem] xl:flex-nowrap">
-                            <div className="flex min-w-0 flex-1 items-center gap-[.14rem]">
+                    <header className="border-b border-slate-200/80 bg-[linear-gradient(180deg,_#fcfdff_0%,_#f6f9ff_100%)] px-[.12rem] py-[.12rem] md:px-[.18rem] md:py-[.14rem] xl:px-[.26rem]">
+                        <div className="flex flex-col gap-[.1rem] md:gap-[.12rem]">
+                            <div className="rounded-[.22rem] border border-[#e3e9f7] bg-[linear-gradient(135deg,_rgba(255,255,255,0.94)_0%,_rgba(246,249,255,0.96)_48%,_rgba(239,244,255,0.92)_100%)] px-[.1rem] py-[.1rem] shadow-[0_.1rem_.26rem_rgba(15,23,42,0.05)] backdrop-blur-xl md:rounded-[.22rem] md:px-[.12rem] md:py-[.12rem] md:shadow-[0_.08rem_.22rem_rgba(15,23,42,0.045)]">
+                                <div className="flex items-start justify-between gap-[.1rem] md:gap-[.12rem] xl:flex-nowrap">
+                                <div className="flex min-w-0 flex-1 items-start gap-[.1rem] md:gap-[.14rem]">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMobileNavOpen(true)}
+                                    className="inline-flex h-[.4rem] w-[.4rem] shrink-0 items-center justify-center rounded-[.14rem] border border-[#dfe5fb] bg-[linear-gradient(180deg,_#ffffff_0%,_#f6f8ff_100%)] text-[#5b6cff] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff] xl:hidden"
+                                >
+                                    <HiMenu size={18} />
+                                </button>
+
                                 <div className="hidden h-[.48rem] w-[.48rem] shrink-0 items-center justify-center rounded-[.16rem] bg-[linear-gradient(135deg,_#eef2ff_0%,_#f6f8ff_100%)] text-[#5b6cff] ring-1 ring-[#dfe5fb] xl:flex">
                                     <Sparkles className="h-[.2rem] w-[.2rem]" />
                                 </div>
 
                                 <div className="min-w-0">
-                                    <div className="flex items-center gap-[.08rem]">
-                                        <span className="rounded-full bg-[#eef2ff] px-[.09rem] py-[.035rem] text-[.105rem] font-semibold uppercase tracking-[0.16em] text-[#5b6cff]">
+                                    <div className="flex flex-wrap items-center gap-[.05rem] md:gap-[.08rem]">
+                                        <span className="rounded-full border border-[#dfe6fb] bg-white/84 px-[.08rem] py-[.035rem] text-[.095rem] font-semibold uppercase tracking-[0.16em] text-[#5b6cff] shadow-[inset_0_0_0_.01rem_rgba(255,255,255,0.6)] md:px-[.09rem] md:text-[.105rem]">
                                             HR workspace
+                                        </span>
+                                        <span className="rounded-full border border-[#e3e8fb] bg-[#fbfcff] px-[.07rem] py-[.03rem] text-[.095rem] font-medium text-slate-500 md:hidden">
+                                            Live today
                                         </span>
                                         <span className="hidden text-[.12rem] text-slate-400 lg:inline">
                                             Live today
                                         </span>
                                     </div>
-                                    <div className="mt-[.05rem] flex min-w-0 items-end gap-[.12rem]">
-                                        <h1 className="truncate text-[.34rem] font-semibold leading-none text-slate-800">
+                                    <div className="mt-[.055rem] flex min-w-0 flex-col gap-[.035rem] md:flex-row md:items-end md:gap-[.12rem]">
+                                        <h1 className="truncate font-['Montserrat'] text-[.3rem] font-semibold leading-none tracking-[-0.03em] text-[#1f2848] md:text-[.3rem] xl:text-[.34rem]">
                                             {pageTitle}
                                         </h1>
-                                        <p className="hidden truncate pb-[.02rem] text-[.14rem] text-slate-500 2xl:block">
+                                        <p className="line-clamp-2 max-w-[4.8rem] text-[.122rem] leading-[1.42] text-[#667392] md:pb-[.02rem] xl:hidden">
+                                            {pageDescriptions[page] || "Manage your HR workflow"}
+                                        </p>
+                                        <p className="hidden truncate pb-[.02rem] text-[.14rem] text-[#667392] 2xl:block">
                                             {pageDescriptions[page] || "Manage your HR workflow"}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex shrink-0 items-center gap-[.1rem]">
-                                <button className="inline-flex items-center gap-[.08rem] rounded-[.16rem] border border-[#dfe5fb] bg-white px-[.13rem] py-[.1rem] text-[.135rem] font-medium text-[#5b6cff] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff]">
+                                <div className="flex shrink-0 items-center gap-[.08rem]">
+                                    <div className="flex items-center gap-[.02rem] rounded-[.16rem] border border-[#dfe5f2] bg-[linear-gradient(180deg,_#ffffff_0%,_#f8faff_100%)] px-[.04rem] py-[.04rem] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] backdrop-blur-sm md:gap-[.08rem] md:rounded-[.18rem] md:px-[.1rem] md:py-[.08rem]">
+                                        <HeaderPopoverButton
+                                            icon={<FaConciergeBell />}
+                                            badge="3"
+                                            label="Requests / Tickets"
+                                            title="Open requests"
+                                            items={requestItems}
+                                            onViewAll={() => navigate("/requests")}
+                                        />
+                                        <HeaderPopoverButton
+                                            icon={<IoIosNotifications />}
+                                            badge="3"
+                                            label="Notifications"
+                                            title="Latest announcements"
+                                            items={notificationItems}
+                                            onViewAll={() => navigate("/announcements")}
+                                        />
+                                        <HeaderIconButton
+                                            icon={<IoMdSettings />}
+                                            label="Settings"
+                                            onClick={() => navigate("/settings")}
+                                        />
+                                    </div>
+
+                                    <button className="shrink-0 rounded-[.16rem] border border-[#dfe5f2] bg-[linear-gradient(180deg,_#ffffff_0%,_#f8faff_100%)] px-[.07rem] py-[.05rem] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff] md:rounded-[.18rem] md:px-[.1rem] md:py-[.08rem]">
+                                        <div className="flex items-center gap-[.1rem]">
+                                            <img
+                                                className="size-[.38rem] rounded-full border border-slate-200 object-cover md:size-[.44rem]"
+                                                src={profileImage}
+                                                alt="User"
+                                            />
+                                            <div className="hidden text-left leading-[1.1] 2xl:block">
+                                                <div className="text-[.145rem] font-semibold text-slate-700">
+                                                    Virgilio Galicia
+                                                </div>
+                                                <div className="mt-[.03rem] text-[.115rem] uppercase tracking-[0.12em] text-slate-400">
+                                                    Admin
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-[.08rem] md:hidden">
+                                <button className="inline-flex items-center gap-[.08rem] rounded-[.14rem] border border-[#dfe5fb] bg-white px-[.12rem] py-[.09rem] text-[.125rem] font-medium text-[#5b6cff] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff]">
+                                    <CalendarDays className="h-[.15rem] w-[.15rem]" />
+                                    <span>April 2026</span>
+                                </button>
+
+                                <div className="rounded-full border border-[#e1e7fb] bg-white px-[.09rem] py-[.05rem] text-[.11rem] font-medium uppercase tracking-[0.14em] text-[#6f7caa]">
+                                    Live today
+                                </div>
+                            </div>
+
+                            <div className="hidden w-full shrink-0 flex-wrap items-center justify-end gap-[.08rem] md:flex xl:w-auto xl:flex-nowrap">
+                                <button className="hidden items-center gap-[.08rem] rounded-[.16rem] border border-[#dfe5fb] bg-white px-[.13rem] py-[.1rem] text-[.135rem] font-medium text-[#5b6cff] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff] md:inline-flex">
                                     <CalendarDays className="h-[.16rem] w-[.16rem]" />
                                     <span>April 2026</span>
                                 </button>
 
-                                <div className="flex items-center gap-[.08rem] rounded-[.18rem] border border-[#dfe5f2] bg-white px-[.1rem] py-[.08rem] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)]">
-                                    <HeaderPopoverButton
-                                        icon={<FaConciergeBell />}
-                                        badge="3"
-                                        label="Requests / Tickets"
-                                        title="Open requests"
-                                        items={requestItems}
-                                        onViewAll={() => navigate("/requests")}
-                                    />
-                                    <HeaderPopoverButton
-                                        icon={<IoIosNotifications />}
-                                        badge="3"
-                                        label="Notifications"
-                                        title="Latest announcements"
-                                        items={notificationItems}
-                                        onViewAll={() => navigate("/announcements")}
-                                    />
-                                    <HeaderIconButton
-                                        icon={<IoMdSettings />}
-                                        label="Settings"
-                                        onClick={() => navigate("/settings")}
-                                    />
-                                </div>
-
-                                <button className="shrink-0 rounded-[.18rem] border border-[#dfe5f2] bg-white px-[.1rem] py-[.08rem] shadow-[0_.04rem_.12rem_rgba(15,23,42,0.04)] transition hover:bg-[#f8faff]">
-                                    <div className="flex items-center gap-[.1rem]">
-                                        <img
-                                            className="size-[.44rem] rounded-full border border-slate-200 object-cover"
-                                            src={profileImage}
-                                            alt="User"
-                                        />
-                                        <div className="hidden text-left leading-[1.1] 2xl:block">
-                                            <div className="text-[.145rem] font-semibold text-slate-700">
-                                                Virgilio Galicia
-                                            </div>
-                                            <div className="mt-[.03rem] text-[.115rem] uppercase tracking-[0.12em] text-slate-400">
-                                                Admin
-                                            </div>
-                                        </div>
-                                    </div>
-                                </button>
                             </div>
                         </div>
                     </header>
 
-                    <section className="flex-1 overflow-auto p-[.24rem]">
-                        <div className="h-full overflow-hidden rounded-[.18rem] border border-slate-200 bg-white shadow-[0_.04rem_.18rem_rgba(15,23,42,0.06)]">
+                    <section className="flex-1 overflow-auto p-[.12rem] md:p-[.18rem] xl:p-[.24rem]">
+                        <div className="h-full overflow-hidden rounded-[.14rem] border border-slate-200 bg-white shadow-[0_.04rem_.18rem_rgba(15,23,42,0.06)] md:rounded-[.18rem]">
                             {children}
                         </div>
                     </section>
@@ -910,7 +972,7 @@ function HeaderIconButton({
             title={label}
             aria-label={label}
             onClick={onClick}
-            className="relative flex size-[.42rem] items-center justify-center rounded-[.12rem] border border-transparent bg-transparent text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+            className="relative flex size-[.38rem] items-center justify-center rounded-[.12rem] border border-transparent bg-transparent text-slate-500 transition hover:bg-slate-50 hover:text-slate-700 md:size-[.42rem]"
         >
             {badge && (
                 <span className="absolute right-[.01rem] top-[.01rem] flex h-[.16rem] min-w-[.16rem] items-center justify-center rounded-full bg-[#ff5b6e] px-[.03rem] text-[.09rem] font-semibold leading-none text-white">
@@ -958,7 +1020,7 @@ function HeaderPopoverButton({
                 title={label}
                 aria-label={label}
                 onClick={() => setOpen((current) => !current)}
-                className={`relative flex size-[.42rem] items-center justify-center rounded-[.12rem] border transition ${
+                className={`relative flex size-[.38rem] items-center justify-center rounded-[.12rem] border transition md:size-[.42rem] ${
                     open
                         ? "border-[#dbe4ff] bg-[#f4f7ff] text-[#5b6cff]"
                         : "border-transparent bg-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-700"
@@ -973,7 +1035,7 @@ function HeaderPopoverButton({
             </button>
 
             <div
-                className={`absolute right-0 top-full z-40 mt-[.08rem] flex h-auto max-h-[4.6rem] w-[3.2rem] origin-top-right flex-col overflow-hidden rounded-[.2rem] border border-[#e2e8f4] bg-white p-[.08rem] shadow-[0_.18rem_.4rem_rgba(15,23,42,0.14)] transition-all duration-200 ${
+                className={`absolute right-0 top-full z-40 mt-[.08rem] flex h-auto max-h-[4.6rem] w-[min(3.2rem,calc(100vw-.28rem))] origin-top-right flex-col overflow-hidden rounded-[.2rem] border border-[#e2e8f4] bg-white p-[.08rem] shadow-[0_.18rem_.4rem_rgba(15,23,42,0.14)] transition-all duration-200 ${
                     open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-[.03rem] opacity-0"
                 }`}
             >

@@ -93,51 +93,51 @@ const reviews = [
 export const Dashboard = () => {
     return (
         <Main>
-            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.28rem]">
+            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.14rem] md:p-[.2rem] xl:p-[.28rem]">
                 <div className="flex min-h-full flex-col gap-[.18rem]">
-                    <div className="rounded-[.24rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f7f9ff_100%)] p-[.2rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
-                        <div className="flex items-start justify-between gap-[.2rem]">
+                    <div className="rounded-[.18rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f7f9ff_100%)] p-[.14rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)] md:rounded-[.24rem] md:p-[.2rem]">
+                        <div className="flex flex-col items-start justify-between gap-[.12rem] lg:flex-row lg:gap-[.2rem]">
                             <div className="max-w-[5.8rem]">
-                                <p className="text-[.14rem] font-medium uppercase tracking-[0.18em] text-[#6c78a6]">
+                                <p className="text-[.11rem] font-medium uppercase tracking-[0.16em] text-[#6c78a6] md:text-[.14rem] md:tracking-[0.18em]">
                                     Workforce pulse
                                 </p>
-                                <h2 className="mt-[.06rem] font-['Montserrat'] text-[.38rem] font-semibold leading-[1.08] text-[#232b57]">
+                                <h2 className="mt-[.05rem] font-['Montserrat'] text-[.24rem] font-semibold leading-[1.08] text-[#232b57] md:text-[.38rem]">
                                     Key HR metrics and actions for this week
                                 </h2>
-                                <p className="mt-[.08rem] text-[.16rem] leading-[1.6] text-[#6c7598]">
+                                <p className="mt-[.06rem] max-w-[4.8rem] text-[.125rem] leading-[1.55] text-[#6c7598] md:text-[.16rem]">
                                     Track attendance, payroll, and review cycles from one clearer operating view.
                                 </p>
                             </div>
 
-                            <button className="inline-flex items-center gap-[.08rem] rounded-[.12rem] border border-[#dce3f6] bg-white px-[.14rem] py-[.1rem] text-[.15rem] font-medium text-[#5b6cff] shadow-sm transition hover:bg-[#f5f7ff]">
+                            <button className="inline-flex items-center gap-[.08rem] rounded-[.12rem] border border-[#dce3f6] bg-white px-[.11rem] py-[.08rem] text-[.125rem] font-medium text-[#5b6cff] shadow-sm transition hover:bg-[#f5f7ff] md:px-[.14rem] md:py-[.1rem] md:text-[.15rem]">
                                 <CalendarDays className="h-[.16rem] w-[.16rem]" />
                                 <span>View calendar</span>
                             </button>
                         </div>
 
-                        <div className="mt-[.18rem] grid gap-[.12rem] xl:grid-cols-4">
+                        <div className="mt-[.14rem] grid gap-[.08rem] sm:grid-cols-2 xl:grid-cols-4">
                             {topMetrics.map((metric) => {
                                 const Icon = metric.icon;
 
                                 return (
                                     <div
                                         key={metric.title}
-                                        className={`rounded-[.18rem] border border-[#e7ebf6] p-[.16rem] ${metric.surface}`}
+                                        className={`rounded-[.16rem] border border-[#e7ebf6] p-[.12rem] ${metric.surface} md:rounded-[.18rem] md:p-[.16rem]`}
                                     >
                                         <div className="flex items-start justify-between gap-[.12rem]">
                                             <div>
-                                                <p className="text-[.14rem] font-medium text-[#6c7598]">
+                                                <p className="text-[.12rem] font-medium text-[#6c7598] md:text-[.14rem]">
                                                     {metric.title}
                                                 </p>
-                                                <p className="mt-[.06rem] font-['Montserrat'] text-[.34rem] font-semibold text-[#232b57]">
+                                                <p className="mt-[.05rem] font-['Montserrat'] text-[.28rem] font-semibold text-[#232b57] md:text-[.34rem]">
                                                     {metric.value}
                                                 </p>
                                             </div>
-                                            <div className={`flex h-[.46rem] w-[.46rem] items-center justify-center rounded-[.14rem] bg-gradient-to-br ${metric.accent} text-white shadow-[0_.08rem_.18rem_rgba(59,91,219,0.18)]`}>
-                                                <Icon className="h-[.22rem] w-[.22rem]" />
+                                            <div className={`flex h-[.38rem] w-[.38rem] items-center justify-center rounded-[.12rem] bg-gradient-to-br ${metric.accent} text-white shadow-[0_.08rem_.18rem_rgba(59,91,219,0.18)] md:h-[.46rem] md:w-[.46rem] md:rounded-[.14rem]`}>
+                                                <Icon className="h-[.18rem] w-[.18rem] md:h-[.22rem] md:w-[.22rem]" />
                                             </div>
                                         </div>
-                                        <p className="mt-[.08rem] text-[.13rem] text-[#7280a7]">
+                                        <p className="mt-[.07rem] text-[.115rem] text-[#7280a7] md:text-[.13rem]">
                                             {metric.detail}
                                         </p>
                                     </div>

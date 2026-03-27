@@ -185,58 +185,58 @@ export const AttendanceOverview = () => {
 
     return (
         <Main>
-            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.28rem]">
+            <section className="h-full overflow-auto bg-[linear-gradient(180deg,_#f8faff_0%,_#f5f7fb_100%)] p-[.14rem] md:p-[.2rem] xl:p-[.28rem]">
                 <div className="flex min-h-full flex-col gap-[.18rem]">
-                    <div className="rounded-[.24rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f7f9ff_100%)] p-[.2rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)]">
-                        <div className="flex items-start justify-between gap-[.18rem]">
+                    <div className="rounded-[.18rem] border border-[#e5e9f5] bg-[linear-gradient(135deg,_#ffffff_0%,_#f7f9ff_100%)] p-[.14rem] shadow-[0_.08rem_.24rem_rgba(15,23,42,0.05)] md:rounded-[.24rem] md:p-[.2rem]">
+                        <div className="flex flex-col items-start justify-between gap-[.12rem] lg:flex-row lg:gap-[.18rem]">
                             <div className="max-w-[6.2rem]">
-                                <p className="text-[.14rem] font-medium uppercase tracking-[0.18em] text-[#6c78a6]">
+                                <p className="text-[.11rem] font-medium uppercase tracking-[0.16em] text-[#6c78a6] md:text-[.14rem] md:tracking-[0.18em]">
                                     Attendance operations
                                 </p>
-                                <h2 className="mt-[.06rem] font-['Montserrat'] text-[.38rem] font-semibold leading-[1.08] text-[#232b57]">
+                                <h2 className="mt-[.05rem] font-['Montserrat'] text-[.24rem] font-semibold leading-[1.08] text-[#232b57] md:text-[.38rem]">
                                     Daily presence, check-ins, and shift coverage
                                 </h2>
-                                <p className="mt-[.08rem] text-[.16rem] leading-[1.6] text-[#6c7598]">
+                                <p className="mt-[.06rem] max-w-[4.9rem] text-[.125rem] leading-[1.55] text-[#6c7598] md:text-[.16rem]">
                                     Review attendance status, identify late arrivals, and track logged hours from one operational view.
                                 </p>
                             </div>
 
-                            <div className="flex items-center gap-[.1rem] rounded-[.18rem] border border-[#dfe5f5] bg-white px-[.14rem] py-[.12rem] shadow-[0_.06rem_.18rem_rgba(15,23,42,0.05)]">
-                                <div className="flex h-[.42rem] w-[.42rem] items-center justify-center rounded-[.14rem] bg-[#eef2ff] text-[#5b6cff]">
-                                    <CalendarRange className="h-[.18rem] w-[.18rem]" />
+                            <div className="flex items-center gap-[.1rem] rounded-[.16rem] border border-[#dfe5f5] bg-white px-[.12rem] py-[.1rem] shadow-[0_.06rem_.18rem_rgba(15,23,42,0.05)] md:rounded-[.18rem] md:px-[.14rem] md:py-[.12rem]">
+                                <div className="flex h-[.36rem] w-[.36rem] items-center justify-center rounded-[.12rem] bg-[#eef2ff] text-[#5b6cff] md:h-[.42rem] md:w-[.42rem] md:rounded-[.14rem]">
+                                    <CalendarRange className="h-[.16rem] w-[.16rem] md:h-[.18rem] md:w-[.18rem]" />
                                 </div>
                                 <div>
-                                    <p className="text-[.11rem] font-semibold uppercase tracking-[0.16em] text-[#8b97b7]">
+                                    <p className="text-[.1rem] font-semibold uppercase tracking-[0.16em] text-[#8b97b7] md:text-[.11rem]">
                                         Current period
                                     </p>
-                                    <p className="mt-[.03rem] text-[.15rem] font-medium text-[#34426b]">
+                                    <p className="mt-[.03rem] text-[.135rem] font-medium text-[#34426b] md:text-[.15rem]">
                                         {dateFilter || "March 2026"}
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="mt-[.18rem] grid gap-[.12rem] xl:grid-cols-3">
+                        <div className="mt-[.14rem] grid gap-[.08rem] xl:grid-cols-3">
                             {statCards.map((card) => {
                                 const Icon = card.icon;
 
                                 return (
                                     <div
                                         key={card.title}
-                                        className={`rounded-[.18rem] border border-[#e7ebf6] p-[.16rem] ${card.surface}`}
+                                        className={`rounded-[.16rem] border border-[#e7ebf6] p-[.12rem] ${card.surface} md:rounded-[.18rem] md:p-[.16rem]`}
                                     >
                                         <div className="flex items-start justify-between gap-[.12rem]">
                                             <div>
-                                                <p className="text-[.14rem] font-medium text-[#6c7598]">{card.title}</p>
-                                                <p className="mt-[.06rem] font-['Montserrat'] text-[.34rem] font-semibold text-[#232b57]">
+                                                <p className="text-[.12rem] font-medium text-[#6c7598] md:text-[.14rem]">{card.title}</p>
+                                                <p className="mt-[.05rem] font-['Montserrat'] text-[.28rem] font-semibold text-[#232b57] md:text-[.34rem]">
                                                     {card.value}
                                                 </p>
                                             </div>
-                                            <div className={`flex h-[.46rem] w-[.46rem] items-center justify-center rounded-[.14rem] bg-gradient-to-br ${card.accent} text-white shadow-[0_.08rem_.18rem_rgba(59,91,219,0.18)]`}>
-                                                <Icon className="h-[.22rem] w-[.22rem]" />
+                                            <div className={`flex h-[.38rem] w-[.38rem] items-center justify-center rounded-[.12rem] bg-gradient-to-br ${card.accent} text-white shadow-[0_.08rem_.18rem_rgba(59,91,219,0.18)] md:h-[.46rem] md:w-[.46rem] md:rounded-[.14rem]`}>
+                                                <Icon className="h-[.18rem] w-[.18rem] md:h-[.22rem] md:w-[.22rem]" />
                                             </div>
                                         </div>
-                                        <p className="mt-[.08rem] text-[.13rem] text-[#7280a7]">{card.detail}</p>
+                                        <p className="mt-[.07rem] text-[.115rem] text-[#7280a7] md:text-[.13rem]">{card.detail}</p>
                                     </div>
                                 );
                             })}

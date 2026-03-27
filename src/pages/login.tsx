@@ -146,9 +146,9 @@ export const Login = () => {
                     </div>
                 </section>
 
-                <section className="relative flex h-full items-center justify-center overflow-hidden px-[.24rem] py-[.24rem] lg:px-[.42rem] lg:py-[.16rem]">
-                    <div className="w-full max-w-[5.4rem]">
-                        <div className="rounded-[.3rem] border border-white/60 bg-white/82 p-[.24rem] shadow-[0_.26rem_.8rem_rgba(15,23,42,0.08)] backdrop-blur-xl sm:p-[.28rem]">
+                <section className="relative flex h-full items-center justify-center overflow-y-auto px-[.02rem] py-[.08rem] sm:px-[.22rem] sm:py-[.22rem] lg:overflow-hidden lg:px-[.42rem] lg:py-[.16rem]">
+                    <div className="flex w-full max-w-[6.15rem] lg:block lg:max-w-[5.4rem]">
+                        <div className="flex w-full flex-col rounded-[.26rem] border border-white/60 bg-white/88 p-[.18rem] shadow-[0_.26rem_.8rem_rgba(15,23,42,0.08)] backdrop-blur-xl sm:rounded-[.3rem] sm:p-[.24rem] lg:block lg:p-[.28rem]">
                             <div className="flex items-center justify-between">
                                 <div className="inline-flex items-center gap-[.12rem] rounded-full bg-slate-900 px-[.16rem] py-[.09rem] text-white lg:hidden">
                                     <img className="h-[.22rem] w-[.22rem]" src={logoImage} alt="HRMS logo" />
@@ -161,25 +161,59 @@ export const Login = () => {
                                 </div>
                             </div>
 
-                            <div className="mt-[.18rem]">
-                                <p className="text-[.16rem] uppercase tracking-[0.24em] text-slate-500">
+                            <div className="mt-[.12rem] overflow-hidden rounded-[.22rem] border border-[#dfe6fb] bg-[linear-gradient(135deg,_#f8faff_0%,_#eef3ff_48%,_#f9fbff_100%)] p-[.14rem] lg:hidden">
+                                <div className="flex items-start justify-between gap-[.1rem]">
+                                    <div>
+                                        <p className="text-[.11rem] font-semibold uppercase tracking-[0.18em] text-[#6d79a6]">
+                                            HR workspace
+                                        </p>
+                                        <p className="mt-[.05rem] max-w-[2.6rem] font-['Montserrat'] text-[.24rem] font-semibold leading-[1.08] text-[#1e274b]">
+                                            People operations in one secure flow.
+                                        </p>
+                                    </div>
+                                    <div className="rounded-[.12rem] bg-white/85 px-[.1rem] py-[.08rem] text-right shadow-[0_.08rem_.16rem_rgba(83,101,246,0.08)]">
+                                        <p className="text-[.1rem] uppercase tracking-[0.12em] text-[#8090bc]">
+                                            teams live
+                                        </p>
+                                        <p className="mt-[.02rem] font-['Montserrat'] text-[.2rem] font-semibold leading-none text-[#3f5ae8]">
+                                            08
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-[.12rem] grid grid-cols-3 gap-[.06rem]">
+                                    {highlights.map((item) => (
+                                        <div key={item.label} className="rounded-[.14rem] border border-[#e3e9fb] bg-white/80 px-[.08rem] py-[.09rem] text-center">
+                                            <p className="font-['Montserrat'] text-[.17rem] font-semibold leading-none text-[#23305a]">
+                                                {item.value}
+                                            </p>
+                                            <p className="mt-[.03rem] text-[.095rem] uppercase tracking-[0.08em] text-[#7b86aa]">
+                                                {item.label}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-[.16rem] sm:mt-[.18rem]">
+                                <p className="text-[.14rem] uppercase tracking-[0.22em] text-slate-500 sm:text-[.16rem] sm:tracking-[0.24em]">
                                     Welcome back
                                 </p>
-                                <h2 className="mt-[.06rem] font-['Montserrat'] text-[.38rem] font-semibold leading-[1.06] text-slate-950">
+                                <h2 className="mt-[.06rem] font-['Montserrat'] text-[.32rem] font-semibold leading-[1.06] text-slate-950 sm:text-[.38rem]">
                                     Sign in to your workspace
                                 </h2>
-                                <p className="mt-[.08rem] max-w-[4.1rem] text-[.16rem] leading-[1.6] text-slate-600">
+                                <p className="mt-[.08rem] max-w-[4.1rem] text-[.15rem] leading-[1.6] text-slate-600 sm:text-[.16rem]">
                                     Access employee records, review requests, and keep daily HR operations on track.
                                 </p>
                             </div>
 
-                            <div className="mt-[.2rem] grid gap-[.13rem]">
+                            <div className="mt-[.18rem] grid gap-[.12rem] sm:mt-[.2rem] sm:gap-[.13rem]">
                                 <label className="grid gap-[.08rem]">
-                                    <span className="text-[.16rem] font-medium text-slate-700">Email address</span>
-                                    <div className="group flex items-center gap-[.12rem] rounded-[.18rem] border border-slate-200 bg-white px-[.16rem] py-[.15rem] transition focus-within:border-[#3b5bdb] focus-within:ring-[.02rem] focus-within:ring-[#3b5bdb]/20">
+                                    <span className="text-[.15rem] font-medium text-slate-700 sm:text-[.16rem]">Email address</span>
+                                    <div className="group flex items-center gap-[.12rem] rounded-[.16rem] border border-slate-200 bg-white px-[.14rem] py-[.13rem] transition focus-within:border-[#3b5bdb] focus-within:ring-[.02rem] focus-within:ring-[#3b5bdb]/20 sm:rounded-[.18rem] sm:px-[.16rem] sm:py-[.15rem]">
                                         <Mail className="h-[.2rem] w-[.2rem] text-slate-400 transition group-focus-within:text-[#3b5bdb]" />
                                         <input
-                                            className="w-full bg-transparent text-[.17rem] text-slate-800 outline-none placeholder:text-slate-400"
+                                            className="w-full bg-transparent text-[.16rem] text-slate-800 outline-none placeholder:text-slate-400 sm:text-[.17rem]"
                                             type="email"
                                             placeholder="Enter username"
                                             value={username}
@@ -190,18 +224,18 @@ export const Login = () => {
 
                                 <label className="grid gap-[.08rem]">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[.16rem] font-medium text-slate-700">Password</span>
+                                        <span className="text-[.15rem] font-medium text-slate-700 sm:text-[.16rem]">Password</span>
                                         <button
                                             type="button"
-                                            className="text-[.15rem] font-medium text-[#3b5bdb] transition hover:text-[#2946ad]"
+                                            className="text-[.14rem] font-medium text-[#3b5bdb] transition hover:text-[#2946ad] sm:text-[.15rem]"
                                         >
                                             Forgot password?
                                         </button>
                                     </div>
-                                    <div className="group flex items-center gap-[.12rem] rounded-[.18rem] border border-slate-200 bg-white px-[.16rem] py-[.15rem] transition focus-within:border-[#3b5bdb] focus-within:ring-[.02rem] focus-within:ring-[#3b5bdb]/20">
+                                    <div className="group flex items-center gap-[.12rem] rounded-[.16rem] border border-slate-200 bg-white px-[.14rem] py-[.13rem] transition focus-within:border-[#3b5bdb] focus-within:ring-[.02rem] focus-within:ring-[#3b5bdb]/20 sm:rounded-[.18rem] sm:px-[.16rem] sm:py-[.15rem]">
                                         <LockKeyhole className="h-[.2rem] w-[.2rem] text-slate-400 transition group-focus-within:text-[#3b5bdb]" />
                                         <input
-                                            className="w-full bg-transparent text-[.17rem] text-slate-800 outline-none placeholder:text-slate-400"
+                                            className="w-full bg-transparent text-[.16rem] text-slate-800 outline-none placeholder:text-slate-400 sm:text-[.17rem]"
                                             type={showPassword ? "text" : "password"}
                                             placeholder="Enter your password"
                                             value={password}
@@ -228,7 +262,7 @@ export const Login = () => {
                                 </label>
                             </div>
 
-                            <div className="mt-[.14rem] flex items-center justify-between text-[.15rem] text-slate-600">
+                            <div className="mt-[.14rem] flex flex-col gap-[.1rem] text-[.145rem] text-slate-600 sm:flex-row sm:items-center sm:justify-between sm:text-[.15rem]">
                                 <label className="flex items-center gap-[.1rem]">
                                     <input
                                         className="h-[.18rem] w-[.18rem] rounded border-slate-300 text-[#3b5bdb] focus:ring-[#3b5bdb]/30"
@@ -237,40 +271,54 @@ export const Login = () => {
                                     />
                                     <span>Keep me signed in</span>
                                 </label>
-                                <span className="rounded-full bg-emerald-50 px-[.12rem] py-[.06rem] text-[.14rem] font-medium text-emerald-700">
+                                <span className="w-fit rounded-full bg-emerald-50 px-[.12rem] py-[.06rem] text-[.13rem] font-medium text-emerald-700 sm:text-[.14rem]">
                                     Protected session
                                 </span>
                             </div>
 
+                            <div className="mt-[.12rem] flex flex-wrap gap-[.06rem] lg:hidden">
+                                {trustPoints.map((point) => (
+                                    <span
+                                        key={point}
+                                        className="inline-flex items-center gap-[.05rem] whitespace-nowrap rounded-full border border-[#dfe6fb] bg-[#f7f9ff] px-[.1rem] py-[.06rem] text-[.108rem] font-medium text-[#5f6e95]"
+                                    >
+                                        <ShieldCheck className="h-[.12rem] w-[.12rem] text-[#5b6cff]" />
+                                        <span>{point}</span>
+                                    </span>
+                                ))}
+                            </div>
+
                             <button
                                 onClick={login}
-                                className="mt-[.18rem] inline-flex w-full items-center justify-center gap-[.12rem] rounded-[.2rem] bg-[linear-gradient(135deg,_#2447d5_0%,_#3b5bdb_45%,_#5b7cfa_100%)] py-[.16rem] text-[.18rem] font-semibold text-white shadow-[0_.18rem_.4rem_rgba(37,99,235,0.25)] transition hover:-translate-y-[.01rem] hover:shadow-[0_.22rem_.48rem_rgba(37,99,235,0.3)]"
+                                className="mt-[.18rem] inline-flex w-full items-center justify-center gap-[.12rem] rounded-[.18rem] bg-[linear-gradient(135deg,_#2447d5_0%,_#3b5bdb_45%,_#5b7cfa_100%)] py-[.15rem] text-[.17rem] font-semibold text-white shadow-[0_.18rem_.4rem_rgba(37,99,235,0.25)] transition hover:-translate-y-[.01rem] hover:shadow-[0_.22rem_.48rem_rgba(37,99,235,0.3)] sm:rounded-[.2rem] sm:py-[.16rem] sm:text-[.18rem]"
                             >
                                 <span>Sign in</span>
                                 <ArrowRight className="h-[.18rem] w-[.18rem]" />
                             </button>
 
-                            <div className="mt-[.18rem] flex items-center gap-[.1rem] text-[.14rem] text-slate-500">
-                                <span className="h-px flex-1 bg-slate-200" />
-                                <span className="px-[.06rem] uppercase tracking-[0.2em]">Trusted workspace</span>
-                                <span className="h-px flex-1 bg-slate-200" />
-                            </div>
+                            <div className="mt-[.16rem] border-t border-[#edf1f8] pt-[.14rem] sm:mt-[.18rem] sm:border-t-0 sm:pt-[.18rem]">
+                                <div className="flex items-center gap-[.1rem] text-[.13rem] text-slate-500 sm:text-[.14rem]">
+                                    <span className="h-px flex-1 bg-slate-200" />
+                                    <span className="px-[.06rem] uppercase tracking-[0.2em]">Trusted workspace</span>
+                                    <span className="h-px flex-1 bg-slate-200" />
+                                </div>
 
-                            <div className="mt-[.14rem] grid grid-cols-3 gap-[.1rem] text-center">
-                                {[
-                                    ["Secure", "Encrypted access"],
-                                    ["Reliable", "Stable operations"],
-                                    ["Ready", "Built for scale"],
-                                ].map(([title, detail]) => (
-                                    <div key={title} className="rounded-[.16rem] bg-slate-50 px-[.12rem] py-[.13rem]">
-                                        <p className="font-['Montserrat'] text-[.2rem] font-semibold text-slate-900">
-                                            {title}
-                                        </p>
-                                        <p className="mt-[.03rem] text-[.12rem] leading-[1.45] text-slate-500">
-                                            {detail}
-                                        </p>
-                                    </div>
-                                ))}
+                                <div className="mt-[.12rem] grid grid-cols-3 gap-[.06rem] text-center sm:grid-cols-3 sm:gap-[.1rem]">
+                                    {[
+                                        ["Secure", "Encrypted access"],
+                                        ["Reliable", "Stable operations"],
+                                        ["Ready", "Built for scale"],
+                                    ].map(([title, detail]) => (
+                                        <div key={title} className="rounded-[.14rem] bg-[linear-gradient(180deg,_#fbfcff_0%,_#f6f8fd_100%)] px-[.08rem] py-[.11rem] shadow-[inset_0_0_0_.01rem_rgba(230,235,246,0.9)] sm:rounded-[.16rem] sm:px-[.12rem] sm:py-[.13rem]">
+                                            <p className="font-['Montserrat'] text-[.16rem] font-semibold text-slate-900 sm:text-[.2rem]">
+                                                {title}
+                                            </p>
+                                            <p className="mt-[.03rem] text-[.105rem] leading-[1.4] text-slate-500 sm:text-[.12rem]">
+                                                {detail}
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
